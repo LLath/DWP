@@ -1,13 +1,23 @@
 require("dotenv").config();
 const path = require("path");
-const { Client, MessageEmbed } = require("discord.js");
+const schedule = require("node-schedule");
+const { Client, MessageEmbed, Guild } = require("discord.js");
 const client = new Client();
 const messages = require("./messages/messages.initialize");
+
+let channel = "";
+
+const j = schedule.scheduleJob("15 15 * * 7", () => {
+  channel.send("Erinnerung! In 15 fängt das Spiel an.");
+});
 
 client.on("ready", () => {
   console.log("Connected as: " + client.user.tag);
 
   client.user.setActivity("DungeonWorld", { type: "PLAYING" });
+
+  // console.log(client.channels.cache.filter((v) => v.name === "chat"));
+  channel = client.channels.cache.get("701102057637281822");
 });
 
 const prefix = "?";
@@ -54,6 +64,10 @@ client.on("message", (msg) => {
       msg.channel.send(
         `${messages.sheets.description} https://drive.google.com/drive/folders/1YVs2Nx6FGd5ZZhqbgWERt0HhHLxdDmnd`
       );
+      break;
+    case `${prefix}schedule`:
+      channel = client.channels.cache.get(msg.channel.id);
+      msg.channel.send("Scheduled your Event");
       break;
 
     default:
