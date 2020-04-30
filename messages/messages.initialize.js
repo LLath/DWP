@@ -14,6 +14,9 @@ const HELP_MESSAGES = {
   sheets: {
     description: "Chractersheets",
   },
+  spoiler: {
+    description: "Spoiler für nächsten Sonntag :)",
+  },
 };
 
 module.exports = HELP_MESSAGES;

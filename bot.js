@@ -69,9 +69,10 @@ client.on("message", (msg) => {
     //   channel = client.channels.cache.get(msg.channel.id);
     //   msg.channel.send("Scheduled your Event");
     //   break;
-    case `${prefix}hi`:
-      channel = client.channels.cache.get(msg.channel.id);
-      msg.channel.send("Hi");
+    case `${prefix}spoiler`:
+      msg.channel.send(`${messages.spoiler.description}`, {
+        files: [path.resolve("./pics/spoiler.jpg")],
+      });
       break;
 
     default:
