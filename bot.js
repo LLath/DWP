@@ -65,10 +65,10 @@ client.on("message", (msg) => {
         `${messages.sheets.description} https://drive.google.com/drive/folders/1YVs2Nx6FGd5ZZhqbgWERt0HhHLxdDmnd`
       );
       break;
-    case `${prefix}schedule`:
-      channel = client.channels.cache.get(msg.channel.id);
-      msg.channel.send("Scheduled your Event");
-      break;
+    // case `${prefix}schedule`:
+    //   channel = client.channels.cache.get(msg.channel.id);
+    //   msg.channel.send("Scheduled your Event");
+    //   break;
 
     default:
       break;
