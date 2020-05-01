@@ -2,7 +2,7 @@ const { MessageEmbed } = require("discord.js");
 const dw = require("dungeonworld-data");
 const classes = Object.keys(dw.basicData.classes);
 
-let embed;
+let embed = new MessageEmbed();
 const dwCommand = (msg, option) => {
   if (classes.includes(option)) {
     let name = dw.basicData.classes[option].name;
@@ -41,7 +41,7 @@ const dwCommand = (msg, option) => {
         "hell_hound",
         "clumsy",
       ];
-      const embed = new MessageEmbed()
+      embed = new MessageEmbed()
         .setTitle("All my Dungeonworld commands:")
         .setColor(11027200)
         .addFields(

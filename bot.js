@@ -16,9 +16,13 @@ const j = schedule.scheduleJob("45 15 * * 7", () => {
 client.on("ready", () => {
   console.log("Connected as: " + client.user.tag);
 
-  client.user.setActivity("DungeonWorld", { type: "PLAYING" });
+  client.user.setActivity("DungeonWorld", { type: "LISTENING" });
 
   channel = client.channels.cache.get("701102057637281822");
+  // const guild = client.guilds.cache.get(msg.guild.id);
+  // const roleID = guild.member(msg.author.id)._roles[0];
+  // const role = guild.roles.cache.find((v) => v.name === "PnP");
+  // channel.send(role);
 });
 
 const prefix = "?";
@@ -32,6 +36,7 @@ client.on("message", (msg) => {
   if (msg.content.indexOf(prefix) !== 0) return;
 
   let modify = msg.content.split(" ");
+  let rollOptions = [...modify];
   const command = modify.shift().slice(prefix.length);
   const option = modify.splice(1, 1);
 
@@ -77,12 +82,13 @@ client.on("message", (msg) => {
     //   msg.channel.send("Scheduled your Event");
     //   break;
     case `roll`:
-      roll(msg, modify);
+      roll(msg, rollOptions);
       break;
     case "dw":
-      dwCommand(msg, modify);
       if (option.length > 0) {
         dwOptions(msg, modify, option);
+      } else {
+        dwCommand(msg, modify.shift());
       }
       break;
 
