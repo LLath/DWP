@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
-
 try {
-  mongoose.connect(process.env.MONGODB, {
+  mongoose.connect(`${process.env.MONGODB}`, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     autoIndex: false,

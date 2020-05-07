@@ -49,7 +49,7 @@ const macro = async (msg, content, db) => {
       msg.channel.send(embed);
     } else {
       msg.reply(
-        'you don\'t have any macros try creating one like \n ?macro "dodge" "?roll 2d6 -1"'
+        'you don\'t have any macros try creating one like \n ?macro "dodge" "?roll 2d6"'
       );
     }
   }

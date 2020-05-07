@@ -5,8 +5,8 @@ const roll = (msg, modify) => {
   const sides = [];
   const dice = [];
   modify.forEach((_dice, index) => {
-    if (_dice.includes("+") && !_dice.includes("d")) {
-      const help_modify = modify[index].slice(1);
+    if ((_dice.includes("+") || _dice.includes("-")) && !_dice.includes("d")) {
+      const help_modify = modify[index];
       result += parseInt(help_modify);
       plus += parseInt(help_modify);
     }
@@ -28,7 +28,7 @@ const roll = (msg, modify) => {
 
   msg.reply(
     `\n rolled ${diceShow.replace(/,/g, " + ")} ${
-      plus !== "" ? `+${plus}` : ""
+      plus > 0 ? `+${plus}` : plus
     } \n dice: [${diceResult}] \n result: ${result}`
   );
 };
