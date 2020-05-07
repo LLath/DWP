@@ -35,6 +35,10 @@ const HELP_MESSAGES = {
     description: "Use ?dw help for more information",
     message: "",
   },
+  macro: {
+    description: 'Macro something like so ?macro "attack" "?roll 2d6 +2"',
+    message: "",
+  },
 };
 
 module.exports = HELP_MESSAGES;

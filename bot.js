@@ -6,13 +6,15 @@ const messages = require("./messages/messages.initialize");
 const roll = require("./roll/roll");
 const dwCommand = require("./dw/dwCommands");
 const dwOptions = require("./dw/dwOptions");
+const macro = require("./macro/macro");
+const db = require("./database/connection");
+const { find } = require("./database/database.macros");
 
 let channel = "";
 
-const j = schedule.scheduleJob("45 15 * * 7", () => {
+const j = schedule.scheduleJob("45 14 * * 7", () => {
   channel.send("Erinnerung! In 15 fängt das Spiel an.");
 });
-
 client.on("ready", () => {
   console.log("Connected as: " + client.user.tag);
 
@@ -31,14 +33,25 @@ const help_descriptions = Object.keys(messages).map(
   (key) => `${messages[`${key}`].description}`
 );
 const help_keys = Object.keys(messages).map((key) => `${prefix}${key}`);
-client.on("message", (msg) => {
+client.on("message", async (msg) => {
   if (msg.author.bot) return;
   if (msg.content.indexOf(prefix) !== 0) return;
+
+  const data = await find(db, msg.client.user.id);
+  const dataMacros =
+    data !== null
+      ? data.macros.filter((c) => c.macro.includes(msg.content))
+      : [];
+
+  if (dataMacros.length > 0) {
+    msg.content = dataMacros[0].command;
+  }
 
   let modify = msg.content.split(" ");
   let rollOptions = [...modify];
   const command = modify.shift().slice(prefix.length);
   const option = modify.splice(1, 1);
+  const macroContent = msg.content.split('"').slice(1);
 
   switch (command.toLowerCase()) {
     case `stats`:
@@ -90,6 +103,9 @@ client.on("message", (msg) => {
       } else {
         dwCommand(msg, modify.shift());
       }
+      break;
+    case `macro`:
+      macro(msg, macroContent, db);
       break;
 
     default:

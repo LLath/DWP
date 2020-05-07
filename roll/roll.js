@@ -1,23 +1,36 @@
 const roll = (msg, modify) => {
+  let plus = 0;
   let result = 0;
-  let dice = [];
-  let help_modify = modify;
+  const diceResult = [];
+  const sides = [];
+  const dice = [];
   modify.forEach((_dice, index) => {
-    if (_dice.includes("+")) {
-      help_modify = modify[index].slice(1);
+    if (_dice.includes("+") && !_dice.includes("d")) {
+      const help_modify = modify[index].slice(1);
       result += parseInt(help_modify);
+      plus += parseInt(help_modify);
     }
     if (_dice.includes("d")) {
-      const sides = modify[index].split("d")[1];
-      const numberOfDice = modify[index].split("d")[0];
+      const _sides = modify[index].split("d")[1];
+      const numberOfDice = modify[index].split("d")[0].replace("+", "") || 1;
       for (let i = 0; i < numberOfDice; i++) {
-        let number = Math.floor(Math.random() * sides + 1);
+        let number = Math.floor(Math.random() * _sides + 1);
         result += number;
-        dice.push(number);
+        diceResult.push(number);
       }
+      sides.push(_sides);
+      dice.push(numberOfDice);
     }
   });
-  msg.reply(`\n result: ${result} \n [${dice}]`);
+  console.log(modify);
+
+  const diceShow = dice.map((d, index) => `${d}d${sides[index]}`).toString();
+
+  msg.reply(
+    `\n rolled ${diceShow.replace(/,/g, " + ")} ${
+      plus !== "" ? `+${plus}` : ""
+    } \n dice: [${diceResult}] \n result: ${result}`
+  );
 };
 
 module.exports = roll;
