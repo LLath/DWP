@@ -18,10 +18,7 @@ const dwOptions = (msg, modify, option) => {
   const embed = new MessageEmbed()
     .setTitle(data.name)
     .setColor(11027200)
-    .addFields({
-      name: "description",
-      value: data.description,
-    });
+    .setDescription(data.description);
   msg.channel.send(embed);
 };
 module.exports = dwOptions;

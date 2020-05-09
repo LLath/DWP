@@ -24,7 +24,7 @@ const HELP_MESSAGES = {
   spoiler: {
     description: "Spoiler für nächsten Sonntag :)",
     message: {
-      files: [path.resolve("./pics/spoiler.jpg")],
+      files: [path.resolve("./pics/spoiler1.jpg")],
     },
   },
   roll: {
@@ -32,7 +32,7 @@ const HELP_MESSAGES = {
     message: "",
   },
   dw: {
-    description: "Use ?dw help for more information",
+    description: "Use ?dw for more information",
     message: "",
   },
   macro: {

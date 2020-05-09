@@ -23,7 +23,7 @@ const dwCommand = (msg, option) => {
         .setDescription(classes);
       msg.channel.send(embed);
       break;
-    case "help":
+    case undefined:
       let data = Object.keys(dw.basicData)
         .slice(0, 10)
         .map((v) =>
