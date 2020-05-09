@@ -18,7 +18,7 @@ const j = schedule.scheduleJob("45 14 * * 7", () => {
 client.on("ready", () => {
   console.log("Connected as: " + client.user.tag);
 
-  client.user.setActivity("DungeonWorld", { type: "LISTENING" });
+  client.user.setActivity("DungeonWorld", { type: "STREAMING" });
 
   channel = client.channels.cache.get("701102057637281822");
   // const guild = client.guilds.cache.get(msg.guild.id);
