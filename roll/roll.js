@@ -19,7 +19,7 @@ const roll = (msg, modify) => {
         modify[index].split("d")[0].replace(/[+-]/g, "") || 1;
       for (let i = 0; i < numberOfDice; i++) {
         let number = Math.floor(Math.random() * _sides + 1);
-        if (sign === "-") {
+        if (_sign === "-") {
           result -= number;
         } else {
           result += number;
