@@ -59,7 +59,7 @@ client.on("message", async (msg) => {
   const macroContent = msg.content.split('"').slice(1);
 
   const YTq = new Array();
-  const YTid = modify[0].slice(modify[0].indexOf("=") + 1);
+  const voiceChannel = msg.member.voice.channel;
 
   switch (command.toLowerCase()) {
     case `stats`:
@@ -116,7 +116,15 @@ client.on("message", async (msg) => {
       macro(msg, macroContent, db);
       break;
     case `play`:
-      const voiceChannel = msg.member.voice.channel;
+      if (modify[0] === undefined) {
+        msg.channel.send(
+          `You didn't provide a url, here the current playlist: ${
+            YTq.length > 0 ? YTq[0].title : "-"
+          }`
+        );
+        return;
+      }
+      const YTid = modify[0].slice(modify[0].indexOf("=") + 1);
       if (!voiceChannel) {
         msg.channel.send("You need to be in a voice channel to play music!");
         return;
@@ -128,7 +136,7 @@ client.on("message", async (msg) => {
         return;
       }
       const item = await fetch(
-        `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${YTid}&key=AIzaSyCnz-qkcuz4E_6pdjr0XEzmkmqnboGzlx4`
+        `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${YTid}&key=${process.env.YOUTUBE_API}`
       )
         .then((v) => v.json())
         .then((a) => a.items[0].snippet);
@@ -154,9 +162,9 @@ client.on("message", async (msg) => {
               .setURL(YTq[0].url);
             dispatcher.setVolume(1);
             msg.channel.send(embed);
-            YTq.shift();
           });
           dispatcher.on("end", () => {
+            YTq.shift();
             voiceChannel.leave();
           });
         })
@@ -165,6 +173,9 @@ client.on("message", async (msg) => {
           console.log(err);
         });
 
+      break;
+    case `stop`:
+      voiceChannel.leave();
       break;
 
     default:
