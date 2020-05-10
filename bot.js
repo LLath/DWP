@@ -2,6 +2,10 @@ require("dotenv").config();
 const schedule = require("node-schedule");
 const { Client, MessageEmbed } = require("discord.js");
 const client = new Client();
+const ytdl = require("ytdl-core");
+const fetch = require("node-fetch");
+
+// Relative imports
 const messages = require("./messages/messages.initialize");
 const roll = require("./roll/roll");
 const dwCommand = require("./dw/dwCommands");
@@ -53,6 +57,9 @@ client.on("message", async (msg) => {
   const command = modify.shift().slice(prefix.length);
   const option = modify.splice(1, 1);
   const macroContent = msg.content.split('"').slice(1);
+
+  const YTq = new Array();
+  const YTid = modify[0].slice(modify[0].indexOf("=") + 1);
 
   switch (command.toLowerCase()) {
     case `stats`:
@@ -107,6 +114,57 @@ client.on("message", async (msg) => {
       break;
     case `macro`:
       macro(msg, macroContent, db);
+      break;
+    case `play`:
+      const voiceChannel = msg.member.voice.channel;
+      if (!voiceChannel) {
+        msg.channel.send("You need to be in a voice channel to play music!");
+        return;
+      }
+
+      const permissions = voiceChannel.permissionsFor(msg.client.user);
+      if (!permissions.has("CONNECT") || !permissions.has("SPEAK")) {
+        msg.channel.send("I need permissions to join a voice channel");
+        return;
+      }
+      const item = await fetch(
+        `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${YTid}&key=AIzaSyCnz-qkcuz4E_6pdjr0XEzmkmqnboGzlx4`
+      )
+        .then((v) => v.json())
+        .then((a) => a.items[0].snippet);
+
+      const YTtemplate = {
+        url: modify[0],
+        title: item.title,
+        thumbnail: item.thumbnails.default.url,
+      };
+      YTq.push(YTtemplate);
+      msg.channel.send(`Added ${item.title} to the playlist.`);
+      voiceChannel
+        .join()
+        .then((conn) => {
+          const stream = ytdl(modify[0], {
+            filter: "audioonly",
+          });
+          const dispatcher = conn.play(stream);
+          dispatcher.on("start", () => {
+            const embed = new MessageEmbed()
+              .setThumbnail(YTq[0].thumbnail)
+              .setTitle(YTq[0].title)
+              .setURL(YTq[0].url);
+            dispatcher.setVolume(1);
+            msg.channel.send(embed);
+            YTq.shift();
+          });
+          dispatcher.on("end", () => {
+            voiceChannel.leave();
+          });
+        })
+        .catch((err) => {
+          voiceChannel.leave();
+          console.log(err);
+        });
+
       break;
 
     default:
