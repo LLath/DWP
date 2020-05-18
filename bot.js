@@ -16,7 +16,7 @@ const { find } = require("./database/database.macros");
 
 let channel = "";
 
-const j = schedule.scheduleJob("45 14 * * 7", () => {
+const j = schedule.scheduleJob("45 13 * * 7", () => {
   channel.send("Erinnerung! In 15 fängt das Spiel an.");
 });
 
