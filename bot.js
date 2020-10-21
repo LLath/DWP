@@ -16,9 +16,9 @@ const { find } = require("./database/database.macros");
 
 let channel = "";
 
-const j = schedule.scheduleJob("45 13 * * 7", () => {
-  channel.send("Erinnerung! In 15 fängt das Spiel an.");
-});
+// const j = schedule.scheduleJob("45 13 * * 7", () => {
+//   channel.send("Erinnerung! In 15 fängt das Spiel an.");
+// });
 
 client.on("ready", () => {
   console.log("Connected as: " + client.user.tag);
