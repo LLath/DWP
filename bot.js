@@ -1,9 +1,9 @@
 require("dotenv").config();
-const schedule = require("node-schedule");
 const { Client, MessageEmbed } = require("discord.js");
 const client = new Client();
 const ytdl = require("ytdl-core");
 const fetch = require("node-fetch");
+const { ToadScheduler, SimpleIntervalJob, Task } = require("toad-scheduler");
 
 // Relative imports
 const messages = require("./messages/messages.initialize");
@@ -11,21 +11,72 @@ const roll = require("./roll/roll");
 const dwCommand = require("./dw/dwCommands");
 const dwOptions = require("./dw/dwOptions");
 const macro = require("./macro/macro");
-const db = require("./database/connection");
+// const db = require("./database/connection");
 const { find } = require("./database/database.macros");
 
-let channel = "";
+const twitchOptions = {
+  headers: new fetch.Headers({
+    Authorization: `Bearer ${process.env.TWITCH_API}`,
+    "Client-Id": process.env.TWITCH_CLIENT_ID,
+  }),
+};
 
-// const j = schedule.scheduleJob("45 13 * * 7", () => {
-//   channel.send("Erinnerung! In 15 fängt das Spiel an.");
-// });
+const fetchClips = async (id, channel, time) => {
+  console.log("Clips", time);
+  const { data } = await fetch(
+    `https://api.twitch.tv/helix/clips?broadcaster_id=${id}&started_at=${time}`,
+    twitchOptions
+  )
+    .then((data) => data.json())
+    .catch((err) => console.log(err));
+
+  if (data === undefined || data?.length < 1) {
+    return;
+  }
+
+  const clipMessage = (clip) =>
+    `${clip.broadcaster_name} - ${clip.title} \nCreator: ${clip.creator_name} \n${clip.url}`;
+
+  channel.send(`Todays clips are:`);
+
+  data.map((clip) => {
+    channel.send(`${clipMessage(clip)}`);
+  });
+};
+
+console.log(new Date());
+const setChannel = async (name, channel) => {
+  const scheduler = new ToadScheduler();
+  if (name === "stop") {
+    scheduler.stop();
+  }
+
+  console.log("SetChannel");
+  // 2022-03-08T00:03:22Z
+  const { data } = await fetch(
+    `https://api.twitch.tv/helix/users?login=${name}`,
+    twitchOptions
+  )
+    .then((data) => data.json())
+    .catch((err) => console.log(err));
+
+  const task = new Task("simple task", () => {
+    fetchClips(data[0].id, channel, new Date());
+  });
+  const job = new SimpleIntervalJob({ days: 1 }, task);
+
+  scheduler.addSimpleIntervalJob(job);
+};
 
 client.on("ready", () => {
   console.log("Connected as: " + client.user.tag);
 
-  client.user.setActivity("DungeonWorld", { type: "STREAMING" });
+  client.user.setUsername("TDWP");
+  client.user.setActivity("Twitch", { type: "WATCHING" });
 
-  channel = client.channels.cache.get("701102057637281822");
+  // channel = client.channels.cache.get("701102057637281822");
+  // guild = client.guilds.cache.get("704271804578922578");
+  // console.log(guild.channels.get);
   // const guild = client.guilds.cache.get(msg.guild.id);
   // const roleID = guild.member(msg.author.id)._roles[0];
   // const role = guild.roles.cache.find((v) => v.name === "PnP");
@@ -42,7 +93,8 @@ client.on("message", async (msg) => {
   if (msg.author.bot) return;
   if (msg.content.indexOf(prefix) !== 0) return;
 
-  const data = await find(db, msg.client.user.id);
+  // const data = await find(db, msg.client.user.id)
+  const data = null;
   const dataMacros =
     data !== null
       ? data.macros.filter((c) => c.macro.includes(msg.content))
@@ -113,7 +165,7 @@ client.on("message", async (msg) => {
       }
       break;
     case `macro`:
-      macro(msg, macroContent, db);
+      // macro(msg, macroContent, db);
       break;
     case `play`:
       if (modify[0] === undefined) {
@@ -177,7 +229,10 @@ client.on("message", async (msg) => {
     case `stop`:
       voiceChannel.leave();
       break;
+    case `clip`:
+      setChannel(modify.toString(), msg.channel);
 
+      break;
     default:
       break;
   }
