@@ -6,10 +6,10 @@
     "dungeonworld-data": "^0.0.8",
     "mongoose": "^5.9.12",
     "node-fetch": "^2.6.0",
-    "node-schedule": "^1.3.2",
     "nodemon": "^2.0.3",
     "pdf2json": "^1.2.0",
     "prettier": "^2.0.5",
+    "toad-scheduler": "^1.6.0",
     "ytdl-core": "^2.1.2"
   },
   "scripts": {
