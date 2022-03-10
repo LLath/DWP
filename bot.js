@@ -1,6 +1,8 @@
 require("dotenv").config();
 const { Client, MessageEmbed } = require("discord.js");
-const client = new Client();
+const client = new Client({
+  intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MESSAGE_TYPING"],
+});
 const ytdl = require("ytdl-core");
 const fetch = require("node-fetch");
 const { ToadScheduler, SimpleIntervalJob, Task } = require("toad-scheduler");
@@ -22,17 +24,22 @@ const twitchOptions = {
 };
 
 const fetchClips = async (id, channel, time) => {
-  console.log("Clips", time);
+  time = new Date(time.setDate(time.getDate() - 1));
+
   const { data } = await fetch(
-    `https://api.twitch.tv/helix/clips?broadcaster_id=${id}&started_at=${time}`,
+    `https://api.twitch.tv/helix/clips?broadcaster_id=${id}&started_at=${time.toISOString()}`,
     twitchOptions
   )
     .then((data) => data.json())
     .catch((err) => console.log(err));
 
+  console.log("DATA undefined", data);
+
   if (data === undefined || data?.length < 1) {
     return;
   }
+
+  console.log("DATA", data);
 
   const clipMessage = (clip) =>
     `${clip.broadcaster_name} - ${clip.title} \nCreator: ${clip.creator_name} \n${clip.url}`;
@@ -44,15 +51,13 @@ const fetchClips = async (id, channel, time) => {
   });
 };
 
-console.log(new Date());
 const setChannel = async (name, channel) => {
   const scheduler = new ToadScheduler();
   if (name === "stop") {
     scheduler.stop();
+    return;
   }
 
-  console.log("SetChannel");
-  // 2022-03-08T00:03:22Z
   const { data } = await fetch(
     `https://api.twitch.tv/helix/users?login=${name}`,
     twitchOptions
@@ -63,7 +68,7 @@ const setChannel = async (name, channel) => {
   const task = new Task("simple task", () => {
     fetchClips(data[0].id, channel, new Date());
   });
-  const job = new SimpleIntervalJob({ days: 1 }, task);
+  const job = new SimpleIntervalJob({ seconds: 30 }, task);
 
   scheduler.addSimpleIntervalJob(job);
 };
@@ -89,7 +94,7 @@ const help_descriptions = Object.keys(messages).map(
   (key) => `${messages[`${key}`].description}`
 );
 const help_keys = Object.keys(messages).map((key) => `${prefix}${key}`);
-client.on("message", async (msg) => {
+client.on("messageCreate", async (msg) => {
   if (msg.author.bot) return;
   if (msg.content.indexOf(prefix) !== 0) return;
 
@@ -229,7 +234,11 @@ client.on("message", async (msg) => {
     case `stop`:
       voiceChannel.leave();
       break;
-    case `clip`:
+    case `clips`:
+      console.log("CLIPSSSS");
+      msg.channel.send(
+        `Clips will be posted in Channel ${msg.channel} every day. You can stop that with ?clips stop`
+      );
       setChannel(modify.toString(), msg.channel);
 
       break;
