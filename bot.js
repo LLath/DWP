@@ -68,7 +68,7 @@ const setChannel = async (name, channel) => {
   const task = new Task("simple task", () => {
     fetchClips(data[0].id, channel, new Date());
   });
-  const job = new SimpleIntervalJob({ seconds: 30 }, task);
+  const job = new SimpleIntervalJob({ days: 1 }, task);
 
   scheduler.addSimpleIntervalJob(job);
 };
