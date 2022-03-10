@@ -77,7 +77,7 @@ client.on("ready", () => {
   console.log("Connected as: " + client.user.tag);
 
   client.user.setUsername("TDWP");
-  client.user.setActivity("Twitch", { type: "WATCHING" });
+  client.user.setActivity("You", { type: "WATCHING" });
 
   // channel = client.channels.cache.get("701102057637281822");
   // guild = client.guilds.cache.get("704271804578922578");
