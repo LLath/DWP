@@ -5,7 +5,6 @@ const client = new Client({
 });
 const ytdl = require("ytdl-core");
 const fetch = require("node-fetch");
-const { ToadScheduler, SimpleIntervalJob, Task } = require("toad-scheduler");
 
 // Relative imports
 const messages = require("./messages/messages.initialize");
@@ -15,63 +14,9 @@ const dwOptions = require("./dw/dwOptions");
 const macro = require("./macro/macro");
 // const db = require("./database/connection");
 const { find } = require("./database/database.macros");
+const { useSchedule } = require("./twitch/clips/scheduler");
 
-const twitchOptions = {
-  headers: new fetch.Headers({
-    Authorization: `Bearer ${process.env.TWITCH_API}`,
-    "Client-Id": process.env.TWITCH_CLIENT_ID,
-  }),
-};
-
-const fetchClips = async (id, channel, time) => {
-  time = new Date(time.setDate(time.getDate() - 1));
-
-  const { data } = await fetch(
-    `https://api.twitch.tv/helix/clips?broadcaster_id=${id}&started_at=${time.toISOString()}`,
-    twitchOptions
-  )
-    .then((data) => data.json())
-    .catch((err) => console.log(err));
-
-  console.log("DATA undefined", data);
-
-  if (data === undefined || data?.length < 1) {
-    return;
-  }
-
-  console.log("DATA", data);
-
-  const clipMessage = (clip) =>
-    `${clip.broadcaster_name} - ${clip.title} \nCreator: ${clip.creator_name} \n${clip.url}`;
-
-  channel.send(`Todays clips are:`);
-
-  data.map((clip) => {
-    channel.send(`${clipMessage(clip)}`);
-  });
-};
-
-const setChannel = async (name, channel) => {
-  const scheduler = new ToadScheduler();
-  if (name === "stop") {
-    scheduler.stop();
-    return;
-  }
-
-  const { data } = await fetch(
-    `https://api.twitch.tv/helix/users?login=${name}`,
-    twitchOptions
-  )
-    .then((data) => data.json())
-    .catch((err) => console.log(err));
-
-  const task = new Task("simple task", () => {
-    fetchClips(data[0].id, channel, new Date());
-  });
-  const job = new SimpleIntervalJob({ days: 1 }, task);
-
-  scheduler.addSimpleIntervalJob(job);
-};
+const schedulerArray = [];
 
 client.on("ready", () => {
   console.log("Connected as: " + client.user.tag);
@@ -235,11 +180,21 @@ client.on("messageCreate", async (msg) => {
       voiceChannel.leave();
       break;
     case `clips`:
-      console.log("CLIPSSSS");
-      msg.channel.send(
-        `Clips will be posted in Channel ${msg.channel} every day. You can stop that with ?clips stop`
-      );
-      setChannel(modify.toString(), msg.channel);
+      if (modify.toString() === "stop") {
+        const findSchedule = schedulerArray.find(
+          (channel) => channel.id === msg.channel.id
+        );
+        findSchedule.scheduler.stop();
+        schedulerArray.splice(schedulerArray.indexOf(findSchedule), 1);
+
+        msg.channel.send(`Posting of clips will be stoped.`);
+        return;
+      } else {
+        msg.channel.send(
+          `Clips will be posted in Channel ${msg.channel} every day. You can stop that with ?clips stop`
+        );
+        useSchedule(modify.toString(), msg.channel, schedulerArray);
+      }
 
       break;
     default:
