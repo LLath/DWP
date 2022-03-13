@@ -1,1 +1,1 @@
-## DungeonWorld assistance bot
+## Personal discord bot
