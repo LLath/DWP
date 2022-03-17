@@ -15,6 +15,7 @@ const macro = require("./macro/macro");
 // const db = require("./database/connection");
 const { find } = require("./database/database.macros");
 const { useSchedule } = require("./twitch/clips/scheduler");
+const { getEmotes } = require("./twitch/emotes/getEmotes");
 
 const schedulerArray = [];
 
@@ -196,6 +197,9 @@ client.on("messageCreate", async (msg) => {
         useSchedule(modify.toString(), msg.channel, schedulerArray);
       }
 
+      break;
+    case `emotes`:
+      getEmotes(modify.toString(), msg.channel);
       break;
     default:
       break;

@@ -1,10 +1,9 @@
 const fetch = require("node-fetch");
 
-const { twitchOptions } = require("./OPTIONS");
+const { twitchOptions } = require("../OPTIONS");
 
 const fetchClips = async (name, channel) => {
   const time = new Date(new Date().setDate(new Date().getDate() - 1));
-  console.log(time);
 
   const { data } = await fetch(
     `https://api.twitch.tv/helix/clips?broadcaster_id=${name}&started_at=${time.toISOString()}`,
@@ -14,6 +13,7 @@ const fetchClips = async (name, channel) => {
     .catch((err) => console.log(err));
 
   if (data === undefined || data?.length < 1) {
+    console.log("fetchClips data is undefined");
     return;
   }
 

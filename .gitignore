@@ -1,3 +1,9 @@
+# private keys
 .env
+
+# build
 /node_modules/
 yarn-error.log
+
+# debug
+twitch/emotes/emojis
