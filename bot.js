@@ -52,7 +52,10 @@ client.on("messageCreate", async (msg) => {
   if (
     msg.member.roles.cache.find((role) => role.name === "MODS") === undefined &&
     msg.member.roles.cache.find((role) => role.name === "PlantQui") ===
-      undefined
+      undefined &&
+    msg.member.roles.cache.find((role) =>
+      role.name.includes("Pandaleo Cub")
+    ) === undefined
   ) {
     return;
   }
