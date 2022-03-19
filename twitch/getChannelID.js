@@ -30,6 +30,7 @@ const getChannelID = async (name) => {
     return returnObj;
   }
 
+  console.log(`INFO: found id ${data[0].id} for name ${name}`);
   returnObj.id = data[0].id;
 
   return returnObj;

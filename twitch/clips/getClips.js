@@ -21,6 +21,7 @@ const fetchClips = async (name, channel) => {
     `${clip.broadcaster_name} - ${clip.title} \nCreator: ${clip.creator_name} \n${clip.url}`;
 
   channel.send(`Todays clips are:`);
+  console.log(`INFO: Found ${data.length} clips for channel ${name}`);
 
   data.map((clip) => {
     channel.send(`${clipMessage(clip)}`);
