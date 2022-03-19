@@ -1,8 +1,6 @@
+//#region imports
 require("dotenv").config();
 const { Client, MessageEmbed } = require("discord.js");
-const client = new Client({
-  intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MESSAGE_TYPING"],
-});
 const ytdl = require("ytdl-core");
 const fetch = require("node-fetch");
 
@@ -16,13 +14,18 @@ const macro = require("./macro/macro");
 const { find } = require("./database/database.macros");
 const { useSchedule } = require("./twitch/clips/scheduler");
 const { getEmotes } = require("./twitch/emotes/getEmotes");
+//#endregion
 
+const client = new Client({
+  intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MESSAGE_TYPING"],
+});
 const schedulerArray = [];
 
+//#region client on ready
 client.on("ready", () => {
   console.log("Connected as: " + client.user.tag);
 
-  client.user.setUsername("TDWP");
+  client.user.setUsername("RootClipper");
   client.user.setActivity("You", { type: "WATCHING" });
 
   // channel = client.channels.cache.get("701102057637281822");
@@ -34,6 +37,8 @@ client.on("ready", () => {
   // channel.send(role);
 });
 
+//#endregion
+
 const prefix = "?";
 
 const help_descriptions = Object.keys(messages).map(
@@ -43,6 +48,14 @@ const help_keys = Object.keys(messages).map((key) => `${prefix}${key}`);
 client.on("messageCreate", async (msg) => {
   if (msg.author.bot) return;
   if (msg.content.indexOf(prefix) !== 0) return;
+
+  if (
+    msg.member.roles.cache.find((role) => role.name === "MODS") === undefined &&
+    msg.member.roles.cache.find((role) => role.name === "PlantQui") ===
+      undefined
+  ) {
+    return;
+  }
 
   // const data = await find(db, msg.client.user.id)
   const data = null;
@@ -65,6 +78,7 @@ client.on("messageCreate", async (msg) => {
   const voiceChannel = msg.member.voice.channel;
 
   switch (command.toLowerCase()) {
+    //#region DWP
     case `stats`:
       msg.channel.send(`${messages.stats.description}`, messages.stats.message);
       break;
@@ -101,10 +115,6 @@ client.on("messageCreate", async (msg) => {
         messages.spoiler.message
       );
       break;
-    // case `${prefix}schedule`:
-    //   channel = client.channels.cache.get(msg.channel.id);
-    //   msg.channel.send("Scheduled your Event");
-    //   break;
     case `roll`:
       roll(msg, rollOptions);
       break;
@@ -180,6 +190,8 @@ client.on("messageCreate", async (msg) => {
     case `stop`:
       voiceChannel.leave();
       break;
+    //#endregion
+    //#region twitch
     case `clips`:
       if (modify.toString() === "stop") {
         const findSchedule = schedulerArray.find(
@@ -201,6 +213,7 @@ client.on("messageCreate", async (msg) => {
     case `emotes`:
       getEmotes(modify.toString(), msg.channel);
       break;
+    //#endregion
     default:
       break;
   }
