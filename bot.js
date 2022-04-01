@@ -1,40 +1,47 @@
 //#region imports
 require("dotenv").config();
-const { Client, MessageEmbed } = require("discord.js");
+const { Client, MessageEmbed, Permissions } = require("discord.js");
 const ytdl = require("ytdl-core");
 const fetch = require("node-fetch");
 
 // Relative imports
-const messages = require("./messages/messages.initialize");
-const roll = require("./roll/roll");
-const dwCommand = require("./dw/dwCommands");
-const dwOptions = require("./dw/dwOptions");
-const macro = require("./macro/macro");
-// const db = require("./database/connection");
-const { find } = require("./database/database.macros");
-const { useSchedule } = require("./twitch/clips/scheduler");
-const { getEmotes } = require("./twitch/emotes/getEmotes");
+const messages = require("./archived/messages/messages.initialize");
+const roll = require("./archived/roll/roll");
+const dwCommand = require("./archived/dw/dwCommands");
+const dwOptions = require("./archived/dw/dwOptions");
+const macro = require("./archived/macro/macro");
+// const db = require("./archived/database/connection");
+const { find } = require("./archived/database/database.macros");
+
+const { useSchedule } = require("./src/twitch/clips/scheduler");
+const { getEmotes } = require("./src/twitch/emotes/getEmotes");
+const { connectRest } = require("./src/api/connection");
 //#endregion
 
 const client = new Client({
-  intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MESSAGE_TYPING"],
+  intents: [
+    "GUILDS",
+    "GUILD_MESSAGES",
+    "GUILD_MESSAGE_TYPING",
+    "GUILD_VOICE_STATES",
+  ],
 });
 const schedulerArray = [];
 
 //#region client on ready
-client.on("ready", () => {
-  console.log("Connected as: " + client.user.tag);
+client.on("ready", async (_client) => {
+  process.env.CLIENT_ID = _client.user.id;
+  console.log("CLIENT_ID", _client.user.id);
 
-  client.user.setUsername("RootClipper");
-  client.user.setActivity("You", { type: "WATCHING" });
+  console.log("Connected as: " + _client.user.tag);
 
-  // channel = client.channels.cache.get("701102057637281822");
-  // guild = client.guilds.cache.get("704271804578922578");
-  // console.log(guild.channels.get);
-  // const guild = client.guilds.cache.get(msg.guild.id);
-  // const roleID = guild.member(msg.author.id)._roles[0];
-  // const role = guild.roles.cache.find((v) => v.name === "PnP");
-  // channel.send(role);
+  _client.user.setUsername("RootClipper");
+  _client.user.setActivity("You", { type: "WATCHING" });
+
+  const { handleCommands, handleSlashCommands } = require("./command-handler");
+
+  handleCommands(_client);
+  await handleSlashCommands(_client);
 });
 
 //#endregion
@@ -164,6 +171,7 @@ client.on("messageCreate", async (msg) => {
       };
       YTq.push(YTtemplate);
       msg.channel.send(`Added ${item.title} to the playlist.`);
+      console.log(voiceChannel);
       voiceChannel
         .join()
         .then((conn) => {
@@ -195,7 +203,7 @@ client.on("messageCreate", async (msg) => {
       break;
     //#endregion
     //#region twitch
-    case `clips`:
+    case `clips2`:
       if (modify.toString() === "stop") {
         const findSchedule = schedulerArray.find(
           (channel) => channel.id === msg.channel.id
@@ -213,10 +221,17 @@ client.on("messageCreate", async (msg) => {
       }
 
       break;
+    // useless discord connect to twitch does the same
     case `emotes`:
       getEmotes(modify.toString(), msg.channel);
       break;
     //#endregion
+    case "test":
+      if (!msg.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
+        console.log("No Admin");
+      }
+      console.log("Admin");
+      break;
     default:
       break;
   }
