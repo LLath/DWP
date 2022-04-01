@@ -1,14 +1,11 @@
 const { twitchOptions } = require("./OPTIONS");
 const fetch = require("node-fetch");
 
-// TODO: Does not need Channel -> logging
-
 /**
  * Fetch UserID from Twitch by name
  *
  * @async
  * @param {string} name
- * @param {object} channel
  * @returns {Promise<object>} id: string, error: string
  */
 const getChannelID = async (name) => {

@@ -1,5 +1,8 @@
 {
+  "version": "0.0.2",
   "dependencies": {
+    "@discordjs/rest": "^0.3.0",
+    "discord-api-types": "^0.30.0",
     "discord.js": "^13.6.0",
     "dotenv": "^8.2.0",
     "dungeonworld-data": "^0.0.8",
@@ -13,5 +16,10 @@
   },
   "scripts": {
     "start": "nodemon bot.js"
-  }
+  },
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/LLath/DWP"
+  },
+  "inviteLink": "https://discord.com/api/oauth2/authorize?client_id=704270215856259073&permissions=1073760320&scope=bot%20applications.commands"
 }
