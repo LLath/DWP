@@ -1,7 +1,14 @@
+const { Channel } = require("discord.js");
 const fetch = require("node-fetch");
 
 const { twitchOptions } = require("../OPTIONS");
 
+/**
+ *
+ * @param {string} name
+ * @param {Channel} channel
+ * @returns
+ */
 const fetchClips = async (name, channel) => {
   const time = new Date(new Date().setDate(new Date().getDate() - 1));
 
