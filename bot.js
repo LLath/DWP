@@ -61,7 +61,7 @@ client.on("messageCreate", async (msg) => {
     msg.member.roles.cache.find((role) => role.name === "PlantQui") ===
       undefined &&
     msg.member.roles.cache.find((role) =>
-      role.name.toLowerCase().includes("pandaleo cub")
+      role.name.toLowerCase().includes("pandaleo")
     ) === undefined
   ) {
     return;
