@@ -1,20 +1,13 @@
 const { ToadScheduler, SimpleIntervalJob, Task } = require("toad-scheduler");
 const { fetchClips } = require("./getClips");
-const { getChannelID } = require("../getChannelID");
 const scheduler = new ToadScheduler();
 
 /**
  * @async
- * @param {string} name twitch channel name
+ * @param {string} id twitch channel id
  * @param {Channel} channel DiscordJS channel
  */
-const useSchedule = async (name, channel) => {
-  const { id, error } = await getChannelID(name);
-  if (error) {
-    console.log(error);
-    channel.send(`An Error occured while fetching twitch id: ${error}`);
-  }
-
+const useSchedule = async (id, channel) => {
   let runningJob = undefined;
   try {
     runningJob = scheduler.getById(channel.id);

@@ -4,6 +4,7 @@ const {
 } = require("discord-api-types/v9");
 
 const { useSchedule, scheduler } = require("../twitch/clips/scheduler");
+const { getChannelID } = require("../twitch/getChannelID");
 
 module.exports = {
   description: "Setup daily posts of clips from a specific twitch channel",
@@ -60,10 +61,19 @@ module.exports = {
 
     const twitchChannelName = options.getString("twitchchannelname");
 
+    const { id, error } = await getChannelID(twitchChannelName);
+    if (error) {
+      console.log(error);
+      await message.reply({
+        content: `An Error occured while fetching twitch id with name ${twitchChannelName}: ${error}`,
+        ephemeral: true,
+      });
+      return;
+    }
     await message.reply({
       content: `Clips will be posted in Channel <\#${discordChannel.id}> every day.`,
       ephemeral: true,
     });
-    await useSchedule(twitchChannelName, discordChannel);
+    await useSchedule(id, discordChannel);
   },
 };
