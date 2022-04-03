@@ -18,7 +18,7 @@ const loadCommands = (commandFiles) => {
 
     commands[commandName.toLowerCase()] = commandFile;
   }
-  console.log("DEBUG: commands", commands);
+  console.log("INFO: commands", commands);
   return commands;
 };
 
@@ -28,7 +28,7 @@ const loadCommands = (commandFiles) => {
  */
 const handleCommands = (client) => {
   const commandFiles = getFiles(`${pathPrefix}/commands`, suffix);
-  console.log("DEBUG: handleCommands - commandFiles", commandFiles);
+  console.log("INFO: handleCommands - commandFiles", commandFiles);
 
   const commands = loadCommands(commandFiles);
 
@@ -62,7 +62,7 @@ const handleSlashCommands = async (client, guildname) => {
   }
 
   const commandFiles = getFiles(`${pathPrefix}/slashCommands`, suffix);
-  console.log("DEBUG: handleSlashCommands - commandFiles", commandFiles);
+  console.log("INFO: handleSlashCommands - commandFiles", commandFiles);
   const commands = loadCommands(commandFiles);
 
   const commandsArray = Object.keys(commands).map(

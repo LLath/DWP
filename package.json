@@ -7,6 +7,7 @@
     "dotenv": "^8.2.0",
     "dungeonworld-data": "^0.0.8",
     "mongoose": "^5.9.12",
+    "node-cron": "^3.0.0",
     "node-fetch": "^2.6.7",
     "nodemon": "^2.0.3",
     "pdf2json": "^1.2.0",
@@ -15,7 +16,8 @@
     "ytdl-core": "^2.1.2"
   },
   "scripts": {
-    "start": "nodemon bot.js"
+    "start": "nodemon bot.js",
+    "dev": "set NODE_ENV=dev&& nodemon bot.js"
   },
   "license": "MIT",
   "repository": {
