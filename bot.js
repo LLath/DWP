@@ -41,7 +41,11 @@ client.on("ready", async (_client) => {
   const { handleCommands, handleSlashCommands } = require("./command-handler");
 
   handleCommands(_client);
-  await handleSlashCommands(_client);
+  if (process.env.NODE_ENV === "dev") {
+    await handleSlashCommands(_client, "Llath's server");
+  } else {
+    await handleSlashCommands(_client);
+  }
 });
 
 //#endregion
