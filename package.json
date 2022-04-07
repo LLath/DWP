@@ -12,12 +12,14 @@
     "nodemon": "^2.0.3",
     "pdf2json": "^1.2.0",
     "prettier": "^2.0.5",
-    "toad-scheduler": "^1.6.0",
     "ytdl-core": "^2.1.2"
   },
   "scripts": {
     "start": "nodemon bot.js",
-    "dev": "set NODE_ENV=dev&& nodemon bot.js"
+    "dev": "set NODE_ENV=dev&& nodemon bot.js",
+    "mongo:setup": "docker pull mongo",
+    "mongo:start": "docker run -d -p 27017:27017 --name scheduler mongo:latest",
+    "mongo:shell": "docker exec -it scheduler mongo"
   },
   "license": "MIT",
   "repository": {

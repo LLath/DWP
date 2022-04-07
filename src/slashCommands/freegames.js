@@ -6,6 +6,7 @@ const {
 const { getFreeGames } = require("../epic/getFreeGames");
 const { message } = require("../epic/message");
 const scheduleManager = require("../helpers/scheduleManager");
+const colors = require("../constants/colors");
 
 module.exports = {
   description: "Post free epic games",
@@ -26,6 +27,12 @@ module.exports = {
           description: "This role will be pinged",
           type: ApplicationCommandOptionType.Role,
         },
+        {
+          name: "color",
+          description: "Choose embed color",
+          type: ApplicationCommandOptionType.Number,
+          choices: [...colors.getColors()],
+        },
       ],
     },
     {
@@ -43,6 +50,10 @@ module.exports = {
   ],
   callback: async (interaction, options) => {
     let discordChannel = interaction.channel;
+    let embedColor = options.getNumber("color");
+    if (embedColor === null) {
+      embedColor = 3447003;
+    }
     const subCommand = options.getSubcommand();
     const textChannel = options.getChannel("textchannel");
     const role = options.getRole("role");
@@ -68,7 +79,7 @@ module.exports = {
       const { freeGames, upcomingPromotions } = await getFreeGames();
 
       freeGames.forEach((game) => {
-        message(discordChannel, game, role);
+        message(discordChannel, game, role, embedColor);
       });
       return upcomingPromotions;
     };
@@ -76,6 +87,8 @@ module.exports = {
     await scheduleManager.createSchedule({
       id: discordChannel.id,
       scheduleFn: () => fetchGames(),
+      changeSchedule: true,
+      type: interaction.commandName,
     });
   },
 };

@@ -1,6 +1,6 @@
 const { Client } = require("discord.js");
 
-const { getFiles } = require("./getFiles");
+const { getFiles } = require("./src/helpers/getFiles");
 const { connectRest } = require("./src/api/connection");
 const { permissionSetter } = require("./src/helpers/permissionSetter");
 
@@ -71,11 +71,11 @@ const handleSlashCommands = async (client, guildname) => {
 
   await connectRest(guildID, commandsArray);
 
-  // permissionSetter(client, commands["clips"]);
+  // permissionSetter(client);
 
   client.on("interactionCreate", async (interaction) => {
     const { commandName, options } = interaction;
-    if (!interaction.isCommand()) return;
+    if (!interaction.isCommand() && !interaction.isUserContextMenu()) return;
 
     try {
       await commands[commandName].callback(interaction, options);

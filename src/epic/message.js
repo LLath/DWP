@@ -4,7 +4,12 @@ const { Channel } = require("discord.js");
  *
  * @param {Channel} channel
  */
-const message = (channel, { title, promotion, url, thumbnail }, role) => {
+const message = (
+  channel,
+  { title, promotion, url, thumbnail },
+  role,
+  embedColor
+) => {
   const description = {};
   if (role !== null) {
     description.description = `<@&${role.id}>`;
@@ -18,7 +23,7 @@ const message = (channel, { title, promotion, url, thumbnail }, role) => {
   channel.send({
     embeds: [
       {
-        color: 3447003,
+        color: embedColor,
         thumbnail: {
           url: thumbnail,
         },

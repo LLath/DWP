@@ -4,6 +4,7 @@
 # build
 /node_modules/
 yarn-error.log
+yarn.lock
 
 # debug
 src/twitch/emotes/emojis

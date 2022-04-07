@@ -3,8 +3,13 @@ const {
   ApplicationCommandOptionType,
 } = require("discord-api-types/v9");
 
-const { useSchedule, scheduler } = require("../twitch/clips/scheduler");
+const { fetchClips } = require("../twitch/clips/getClips");
 const { getChannelID } = require("../twitch/getChannelID");
+const scheduleManager = require("../helpers/scheduleManager");
+const {
+  CommandInteraction,
+  CommandInteractionOptionResolver,
+} = require("discord.js");
 
 module.exports = {
   description: "Setup daily posts of clips from a specific twitch channel",
@@ -26,6 +31,11 @@ module.exports = {
           description: "Text channel the clips will be posted in",
           type: ApplicationCommandOptionType.Channel,
         },
+        {
+          name: "time",
+          description: "Hour from 1-24 when clips should be posted",
+          type: ApplicationCommandOptionType.Number,
+        },
       ],
     },
     {
@@ -41,21 +51,38 @@ module.exports = {
       ],
     },
   ],
-  callback: async (message, options) => {
-    let discordChannel = message.channel;
+  /**
+   *
+   * @param {CommandInteraction} interaction
+   * @param {CommandInteractionOptionResolver} options
+   * @returns
+   */
+  callback: async (interaction, options) => {
+    let discordChannel = interaction.channel;
+    let time = options.getNumber("time");
+    if (time === null) {
+      time = new Date().getDate();
+    }
+    if (time > 24 || time < 1) {
+      await interaction.reply({
+        content: `${time} is not a valid hour of a day. Please try another number. If you think that's not correct please contact the developer :)`,
+        ephemeral: true,
+      });
+      return;
+    }
     const subCommand = options.getSubcommand();
     const textChannel = options.getChannel("textchannel");
     if (textChannel !== null) {
-      discordChannel = await message.guild.channels.fetch(textChannel.id);
+      discordChannel = await interaction.guild.channels.fetch(textChannel.id);
     }
 
     if (subCommand === "stop") {
       console.log("INFO: stop");
-      await message.reply({
+      await interaction.reply({
         content: "Posting of clips will be stopped",
         ephemeral: true,
       });
-      scheduler.removeById(discordChannel.id);
+      scheduleManager.stopById(discordChannel.id);
       return;
     }
 
@@ -64,16 +91,22 @@ module.exports = {
     const { id, error } = await getChannelID(twitchChannelName);
     if (error) {
       console.log(error);
-      await message.reply({
+      await interaction.reply({
         content: `An Error occured while fetching twitch id with name ${twitchChannelName}: ${error}`,
         ephemeral: true,
       });
       return;
     }
-    await message.reply({
+    await interaction.reply({
       content: `Clips will be posted in Channel <\#${discordChannel.id}> every day.`,
       ephemeral: true,
     });
-    await useSchedule(id, discordChannel);
+
+    await scheduleManager.createSchedule({
+      id: discordChannel.id,
+      scheduleFn: () => fetchClips(id, discordChannel),
+      time: { hour: time },
+      type: interaction.commandName,
+    });
   },
 };
