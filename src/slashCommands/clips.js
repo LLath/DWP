@@ -61,7 +61,7 @@ module.exports = {
     let discordChannel = interaction.channel;
     let time = options.getNumber("time");
     if (time === null) {
-      time = new Date().getDate();
+      time = new Date().getHours();
     }
     if (time > 24 || time < 1) {
       await interaction.reply({
