@@ -38,6 +38,9 @@ const getFreeGames = async () => {
 
   data.Catalog.searchStore.elements.forEach(
     ({ title, promotions, productSlug, keyImages }) => {
+      if (productSlug === null) {
+        productSlug = title;
+      }
       if (promotions === null) {
         // FIXME: DEBUG
         // console.log(`No promotion for game ${title}`);
