@@ -96,9 +96,13 @@ module.exports = {
     const fetchGames = async () => {
       const { freeGames, upcomingPromotions } = await getFreeGames();
 
-      freeGames.forEach((game) => {
-        message(discordChannel, game, role, embedColor);
-      });
+      if (runImmediately) {
+        freeGames.forEach((game) => {
+          message(discordChannel, game, role, embedColor);
+        });
+      } else {
+        runImmediately = true;
+      }
       return upcomingPromotions;
     };
 
