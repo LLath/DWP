@@ -6,7 +6,7 @@ const fetch = require("node-fetch");
 
 // Relative imports
 const messages = require("./archived/messages/messages.initialize");
-// const db = require("./src/database/connection").connect();
+const db = require("./src/database/connection");
 const roll = require("./archived/roll/roll");
 const dwCommand = require("./archived/dw/dwCommands");
 const dwOptions = require("./archived/dw/dwOptions");
@@ -15,6 +15,7 @@ const { find } = require("./archived/database/database.macros");
 
 const { getEmotes } = require("./src/twitch/emotes/getEmotes");
 const { connectRest } = require("./src/api/connection");
+
 //#endregion
 
 const client = new Client({
@@ -37,6 +38,7 @@ client.on("ready", async (_client) => {
   _client.user.setActivity("You", { type: "WATCHING" });
 
   const { handleCommands, handleSlashCommands } = require("./command-handler");
+  await db.connect();
 
   handleCommands(_client);
   if (process.env.NODE_ENV === "dev") {
