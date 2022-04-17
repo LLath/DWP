@@ -33,8 +33,13 @@ module.exports = {
         },
         {
           name: "time",
-          description: "Hour from 1-24 when clips should be posted",
+          description: "Hour from 0-23 when clips should be posted",
           type: ApplicationCommandOptionType.Number,
+        },
+        {
+          name: "immediat",
+          description: "Should the task run immediately default=false",
+          type: ApplicationCommandOptionType.Boolean,
         },
       ],
     },
@@ -57,56 +62,77 @@ module.exports = {
    * @param {CommandInteractionOptionResolver} options
    * @returns
    */
-  callback: async (interaction, options) => {
-    let discordChannel = interaction.channel;
-    let time = options.getNumber("time");
-    if (time === null) {
-      time = new Date().getHours();
-    }
-    if (time > 24 || time < 1) {
+  callback: async (interaction, options, discordChannel, dbItem) => {
+    let commandName;
+    let runImmediately = false;
+    let twitchChannelName;
+    let time;
+
+    if (interaction !== null && options !== null) {
+      commandName = interaction.commandName;
+      discordChannel = interaction.channel;
+      runImmediately = options.getBoolean("immediat");
+      time = options.getNumber("time");
+      if (time === null) {
+        time = new Date().getHours();
+      }
+      if (time >= 24 || time < 0) {
+        await interaction.reply({
+          content: `${time} is not a valid hour of a day. Please try another number. If you think that's not correct please contact the developer :)`,
+          ephemeral: true,
+        });
+        return;
+      }
+      const subCommand = options.getSubcommand();
+      const textChannel = options.getChannel("textchannel");
+      if (textChannel !== null) {
+        discordChannel = await interaction.guild.channels.fetch(textChannel.id);
+      }
+
+      if (subCommand === "stop") {
+        console.log("INFO: stop");
+        await interaction.reply({
+          content: "Posting of clips will be stopped",
+          ephemeral: true,
+        });
+        scheduleManager.stopById(discordChannel.id);
+        return;
+      }
+      twitchChannelName = options.getString("twitchchannelname");
+
       await interaction.reply({
-        content: `${time} is not a valid hour of a day. Please try another number. If you think that's not correct please contact the developer :)`,
+        content: `Clips will be posted in Channel <\#${discordChannel.id}> every day.`,
         ephemeral: true,
       });
-      return;
+    } else {
+      commandName = dbItem.type;
+      discordChannel.id = dbItem.id;
+      time = dbItem.time.hour;
+      twitchChannelName = dbItem.name;
     }
-    const subCommand = options.getSubcommand();
-    const textChannel = options.getChannel("textchannel");
-    if (textChannel !== null) {
-      discordChannel = await interaction.guild.channels.fetch(textChannel.id);
-    }
-
-    if (subCommand === "stop") {
-      console.log("INFO: stop");
-      await interaction.reply({
-        content: "Posting of clips will be stopped",
-        ephemeral: true,
-      });
-      scheduleManager.stopById(discordChannel.id);
-      return;
-    }
-
-    const twitchChannelName = options.getString("twitchchannelname");
 
     const { id, error } = await getChannelID(twitchChannelName);
     if (error) {
-      console.log(error);
-      await interaction.reply({
+      const errorMessage = {
         content: `An Error occured while fetching twitch id with name ${twitchChannelName}: ${error}`,
         ephemeral: true,
-      });
+      };
+      console.log(error);
+      if (interaction === null) {
+        discordChannel.send(errorMessage);
+        return;
+      }
+      await interaction.reply(errorMessage);
       return;
     }
-    await interaction.reply({
-      content: `Clips will be posted in Channel <\#${discordChannel.id}> every day.`,
-      ephemeral: true,
-    });
 
     await scheduleManager.createSchedule({
       id: discordChannel.id,
       scheduleFn: () => fetchClips(id, discordChannel),
       time: { hour: time },
-      type: interaction.commandName,
+      type: commandName,
+      runImmediately,
+      name: twitchChannelName,
     });
   },
 };

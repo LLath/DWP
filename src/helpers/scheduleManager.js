@@ -1,5 +1,7 @@
 const cron = require("node-cron");
 
+const { useModel } = require("../database/database.functions");
+
 const schedules = {};
 
 /**
@@ -18,6 +20,7 @@ const schedules = {};
  * @property {scheduleFn} scheduleFn
  * @property {boolean} changeSchedule
  * @property {string} type
+ * @property {boolean} runImmediately
  *
  */
 
@@ -32,9 +35,7 @@ const deleteJob = (job) => {
 };
 
 /**
- *
  * @param {task} job
- *
  */
 const changeSchedule = async (job) => {
   const schedule = schedules[job.type].find(
@@ -44,10 +45,19 @@ const changeSchedule = async (job) => {
   await _createSchedule(job);
 };
 
+/**
+ * @param {task} job
+ */
 const _createSchedule = async (job) => {
   const duplicate = schedules[job.type]?.find(
     (schedule) => schedule.id === job.id
   );
+  const db = useModel(job.type);
+  if (duplicate === undefined) {
+    job.runImmediately = false;
+    await db.create(job);
+  }
+  console.log("DEBUG: job", job);
   if (duplicate !== undefined) {
     console.log("INFO: Duplicate detected reusing job");
     deleteJob(duplicate);
@@ -66,7 +76,7 @@ const _createSchedule = async (job) => {
     day = new Date(upcomingPromotions[0]).getDate();
     month = new Date(upcomingPromotions[0]).getMonth() + 1;
     hour = new Date(upcomingPromotions[0]).getHours();
-  } else {
+  } else if (job.runImmediately) {
     await job.scheduleFn();
   }
 
@@ -92,6 +102,8 @@ const _createSchedule = async (job) => {
     task,
     time: { day, month, hour, minute },
   });
+
+  console.log("DEBUG: schedules", schedules);
   console.log(`INFO: creating a task ${job.type} #${job.id}`);
 };
 const getById = (id) => {

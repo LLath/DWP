@@ -11,8 +11,8 @@ const message = (
   embedColor
 ) => {
   const description = {};
-  if (role !== null) {
-    description.description = `<@&${role.id}>`;
+  if (role !== null && role !== undefined) {
+    description.description = `<@&${role}>`;
   }
   const period = `${new Date(
     promotion.endDate

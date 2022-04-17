@@ -33,6 +33,11 @@ module.exports = {
           type: ApplicationCommandOptionType.Number,
           choices: [...colors.getColors()],
         },
+        {
+          name: "immediat",
+          description: "Should the task run immediately default=false",
+          type: ApplicationCommandOptionType.Boolean,
+        },
       ],
     },
     {
@@ -48,32 +53,45 @@ module.exports = {
       ],
     },
   ],
-  callback: async (interaction, options) => {
-    let discordChannel = interaction.channel;
-    let embedColor = options.getNumber("color");
-    if (embedColor === null) {
-      embedColor = 3447003;
-    }
-    const subCommand = options.getSubcommand();
-    const textChannel = options.getChannel("textchannel");
-    const role = options.getRole("role");
-    if (textChannel !== null) {
-      discordChannel = await interaction.guild.channels.fetch(textChannel.id);
-    }
+  callback: async (interaction, options, discordChannel, dbItem) => {
+    let commandName;
+    let role = null;
+    let embedColor;
+    let runImmediately = false;
+    if (interaction !== null && options !== null) {
+      commandName = interaction.commandName;
+      discordChannel = interaction.channel;
+      role = options.getRole("role")?.id;
+      embedColor = options.getNumber("color");
+      if (embedColor === null) {
+        embedColor = 3447003;
+      }
+      const subCommand = options.getSubcommand();
+      const textChannel = options.getChannel("textchannel");
+      if (textChannel !== null) {
+        discordChannel = await interaction.guild.channels.fetch(textChannel.id);
+      }
+      runImmediately = options.getBoolean("immediat");
 
-    if (subCommand === "stop") {
-      console.log("INFO: stop");
+      if (subCommand === "stop") {
+        console.log("INFO: stop");
+        await interaction.reply({
+          content: "Posting free epic games is stopped",
+          ephemeral: true,
+        });
+        scheduleManager.stopById(discordChannel.id);
+        return;
+      }
       await interaction.reply({
-        content: "Posting free epic games is stopped",
+        content: `Free epic games will be posted in Channel <\#${discordChannel.id}>.`,
         ephemeral: true,
       });
-      scheduleManager.stopById(discordChannel.id);
-      return;
+    } else {
+      commandName = dbItem.type;
+      role = dbItem.role;
+      embedColor = dbItem.embedColor;
+      discordChannel.id = dbItem.id;
     }
-    await interaction.reply({
-      content: `Free epic games will be posted in Channel <\#${discordChannel.id}>.`,
-      ephemeral: true,
-    });
 
     const fetchGames = async () => {
       const { freeGames, upcomingPromotions } = await getFreeGames();
@@ -88,7 +106,10 @@ module.exports = {
       id: discordChannel.id,
       scheduleFn: () => fetchGames(),
       changeSchedule: true,
-      type: interaction.commandName,
+      type: commandName,
+      runImmediately,
+      role,
+      embedColor,
     });
   },
 };

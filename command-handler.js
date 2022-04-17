@@ -3,6 +3,7 @@ const { Client } = require("discord.js");
 const { getFiles } = require("./src/helpers/getFiles");
 const { connectRest } = require("./src/api/connection");
 const { permissionSetter } = require("./src/helpers/permissionSetter");
+const { restart } = require("./src/helpers/restartFn");
 
 const suffix = ".js";
 const pathPrefix = "./src";
@@ -18,6 +19,7 @@ const loadCommands = (commandFiles) => {
 
     commands[commandName.toLowerCase()] = commandFile;
   }
+
   console.log("INFO: commands", commands);
   return commands;
 };
@@ -70,6 +72,8 @@ const handleSlashCommands = async (client, guildname) => {
   );
 
   await connectRest(guildID, commandsArray);
+
+  await restart(client, commands);
 
   // permissionSetter(client);
 
