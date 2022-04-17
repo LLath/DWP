@@ -33,7 +33,7 @@ module.exports = {
         },
         {
           name: "time",
-          description: "Hour from 0-23 when clips should be posted",
+          description: "Hour from 0-23 when clips should be posted; uses UTC",
           type: ApplicationCommandOptionType.Number,
         },
         {
