@@ -57,7 +57,6 @@ const _createSchedule = async (job) => {
     job.runImmediately = false;
     await db.create(job);
   }
-  console.log("DEBUG: job", job);
   if (duplicate !== undefined) {
     console.log("INFO: Duplicate detected reusing job");
     deleteJob(duplicate);
@@ -80,20 +79,20 @@ const _createSchedule = async (job) => {
     await job.scheduleFn();
   }
 
-  // if (process.env.NODE_ENV === "dev") {
-  //   day = "*";
-  //   month = "*";
-  //   hour = "*";
-  //   minute = "*";
-  // }
+  if (process.env.NODE_ENV === "dev") {
+    day = "*";
+    month = "*";
+    hour = "*";
+    minute = "*";
+  }
 
   const task = cron.schedule(
     `${minute} ${hour} ${day} ${month} *`,
     async () => {
-      await job.scheduleFn();
-
       if (job.changeSchedule) {
         changeSchedule(job);
+      } else {
+        await job.scheduleFn();
       }
     }
   );
@@ -103,7 +102,6 @@ const _createSchedule = async (job) => {
     time: { day, month, hour, minute },
   });
 
-  console.log("DEBUG: schedules", schedules);
   console.log(`INFO: creating a task ${job.type} #${job.id}`);
 };
 const getById = (id) => {

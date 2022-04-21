@@ -37,7 +37,7 @@ const getFreeGames = async () => {
   ).then((data) => data.json());
 
   data.Catalog.searchStore.elements.forEach(
-    ({ title, promotions, productSlug, keyImages }) => {
+    ({ title, promotions, productSlug, keyImages, offerMappings }) => {
       if (productSlug === null) {
         productSlug = title;
       }
@@ -46,6 +46,10 @@ const getFreeGames = async () => {
         // console.log(`No promotion for game ${title}`);
         return;
       }
+      if (offerMappings.length > 0) {
+        productSlug = offerMappings[0].pageSlug;
+      }
+
       const promotion = promotions.promotionalOffers[0]?.promotionalOffers[0];
       const upcomingPromotion =
         promotions.upcomingPromotionalOffers[0]?.promotionalOffers[0];
