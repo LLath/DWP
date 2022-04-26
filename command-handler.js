@@ -4,6 +4,7 @@ const { getFiles } = require("./src/helpers/getFiles");
 const { connectRest } = require("./src/api/connection");
 const { permissionSetter } = require("./src/helpers/permissionSetter");
 const { restart } = require("./src/helpers/restartFn");
+const { isConnected } = require("./src/database/connection");
 
 const suffix = ".js";
 const pathPrefix = "./src";
@@ -15,7 +16,7 @@ const loadCommands = (commandFiles) => {
 
     const split = command.replace(/\\/g, "/").split("/");
     const commandName = split[split.length - 1].replace(suffix, "");
-    commandFile["name"] = commandName;
+    commandFile["name"] = `${commandName}${process.env.NODE_ENV}`;
 
     commands[commandName.toLowerCase()] = commandFile;
   }
@@ -73,16 +74,20 @@ const handleSlashCommands = async (client, guildname) => {
 
   await connectRest(guildID, commandsArray);
 
-  await restart(client, commands);
+  if (isConnected) await restart(client, commands);
 
   // permissionSetter(client);
 
   client.on("interactionCreate", async (interaction) => {
     const { commandName, options } = interaction;
+    let _commandName = commandName;
     if (!interaction.isCommand() && !interaction.isUserContextMenu()) return;
 
+    if (process.env.NODE_ENV === "dev") {
+      _commandName = _commandName.replace(/dev$/g, "");
+    }
     try {
-      await commands[commandName].callback(interaction, options);
+      await commands[_commandName].callback(interaction, options);
     } catch (error) {
       console.error(error);
     }

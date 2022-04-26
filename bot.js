@@ -35,7 +35,7 @@ client.on("ready", async (_client) => {
   console.log("Connected as: " + _client.user.tag);
 
   _client.user.setUsername("RootClipper");
-  _client.user.setActivity("You", { type: "WATCHING" });
+  _client.user.setActivity("Twitch", { type: "STREAMING" });
 
   const { handleCommands, handleSlashCommands } = require("./command-handler");
   await db.connect();

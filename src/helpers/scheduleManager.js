@@ -1,6 +1,7 @@
 const cron = require("node-cron");
 
 const { useModel } = require("../database/database.functions");
+const { isConnected } = require("../database/connection");
 
 const schedules = {};
 
@@ -52,10 +53,12 @@ const _createSchedule = async (job) => {
   const duplicate = schedules[job.type]?.find(
     (schedule) => schedule.id === job.id
   );
-  const db = useModel(job.type);
-  if (duplicate === undefined) {
-    job.runImmediately = false;
-    await db.create(job);
+  if (isConnected) {
+    const db = useModel(job.type);
+    if (duplicate === undefined) {
+      job.runImmediately = false;
+      await db.create(job);
+    }
   }
   if (duplicate !== undefined) {
     console.log("INFO: Duplicate detected reusing job");

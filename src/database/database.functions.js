@@ -40,6 +40,9 @@ async function create(template) {
  * @returns Functions [findById, create, findAll] and model
  */
 const useModel = (_model) => {
+  if (process.env.NODE_ENV === "dev") {
+    _model = _model.replace(/dev$/g, "");
+  }
   const model = require(`./model/model.${_model}`);
   return { model, findById, create, findAll };
 };

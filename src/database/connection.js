@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+let isConnected = false;
+
 /**
  * @returns {Promise}
  */
@@ -19,10 +21,12 @@ const _connect = async () => {
 };
 
 mongoose.connection.once("open", () => {
+  isConnected = true;
   console.log("Connected to Database!");
 });
 
 module.exports = {
   connect: async () => await _connect(),
+  isConnected,
   getDb: mongoose.connection,
 };
