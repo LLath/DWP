@@ -21,7 +21,6 @@ const loadCommands = (commandFiles) => {
     commands[commandName.toLowerCase()] = commandFile;
   }
 
-  console.log("INFO: commands", commands);
   return commands;
 };
 
