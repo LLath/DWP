@@ -17,9 +17,7 @@ const loadCommands = (commandFiles) => {
 
     const split = command.replace(/\\/g, "/").split("/");
     const commandName = split[split.length - 1].replace(suffix, "");
-    commandFile["name"] = `${commandName}${
-      process.env.NODE_ENV !== undefined ? process.env.NODE_ENV : ""
-    }`;
+    commandFile["name"] = `${commandName}${process.env.NODE_ENV}`;
 
     commands[commandName.toLowerCase()] = commandFile;
   }
