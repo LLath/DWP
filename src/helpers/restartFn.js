@@ -19,7 +19,7 @@ const restart = async (client, commands) => {
         commands[command].callback(null, null, channel, item);
       });
     } catch (error) {
-      log(`${command} has no db model`, "info");
+      log(`${command} failed while searching db`, "error");
     }
   }
 };
