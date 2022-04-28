@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const { log } = require("@llath/logger");
 
 /**
  * @typedef promotion
@@ -55,8 +56,9 @@ const getFreeGames = async () => {
         promotions.upcomingPromotionalOffers[0]?.promotionalOffers[0];
 
       if (promotions?.promotionalOffers?.length < 1) {
-        console.log(
-          `Upcoming promotion for game ${title}; ${upcomingPromotion.startDate}`
+        log(
+          `Upcoming promotion for game ${title}; ${upcomingPromotion.startDate}`,
+          "debug"
         );
         upcomingPromotions.push(upcomingPromotion.startDate);
         return;

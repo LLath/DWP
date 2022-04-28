@@ -1,18 +1,16 @@
 {
-  "version": "0.1.2",
+  "version": "1.0.0",
   "dependencies": {
     "@discordjs/rest": "^0.3.0",
+    "@llath/logger": "^1.1.1",
     "discord-api-types": "^0.30.0",
     "discord.js": "^13.6.0",
     "dotenv": "^8.2.0",
-    "dungeonworld-data": "^0.0.8",
     "mongoose": "^5.9.12",
     "node-cron": "^3.0.0",
     "node-fetch": "^2.6.7",
     "nodemon": "^2.0.3",
-    "pdf2json": "^1.2.0",
-    "prettier": "^2.0.5",
-    "ytdl-core": "^2.1.2"
+    "prettier": "^2.0.5"
   },
   "scripts": {
     "start": "nodemon bot.js",

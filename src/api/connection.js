@@ -1,19 +1,20 @@
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
+const { log } = require("@llath/logger");
 
 const rest = new REST({ version: "9" }).setToken(process.env.TOKEN);
 
 const connectRest = async (guildID, commands) => {
   try {
-    console.log("Started refreshing application (/) commands.");
+    log("Started refreshing application (/) commands.", "info");
 
     if (guildID === undefined) {
-      console.log("INFO: Put global commands");
+      log("Put global commands", "info");
       await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
         body: commands,
       });
     } else {
-      console.log("INFO: Put guild commands");
+      log("Put guild commands", "info");
       await rest.put(
         Routes.applicationGuildCommands(process.env.CLIENT_ID, guildID),
         {
@@ -22,9 +23,9 @@ const connectRest = async (guildID, commands) => {
       );
     }
 
-    console.log("Successfully reloaded application (/) commands.");
+    log("Successfully reloaded application (/) commands.", "info");
   } catch (error) {
-    console.error("ERROR:", error);
+    error(error, "error");
   }
 };
 

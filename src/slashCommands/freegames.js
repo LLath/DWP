@@ -2,6 +2,7 @@ const {
   ApplicationCommandType,
   ApplicationCommandOptionType,
 } = require("discord-api-types/v9");
+const { log } = require("@llath/logger");
 
 const { getFreeGames } = require("../epic/getFreeGames");
 const { message } = require("../epic/message");
@@ -74,7 +75,7 @@ module.exports = {
       runImmediately = options.getBoolean("immediat");
 
       if (subCommand === "stop") {
-        console.log("INFO: stop");
+        log("stop", "info");
         await interaction.reply({
           content: "Posting free epic games is stopped",
           ephemeral: true,

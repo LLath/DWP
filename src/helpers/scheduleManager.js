@@ -1,4 +1,5 @@
 const cron = require("node-cron");
+const { log } = require("@llath/logger");
 
 const { useModel } = require("../database/database.functions");
 const { isConnected } = require("../database/connection");
@@ -26,13 +27,15 @@ const schedules = {};
  */
 
 const deleteJob = (job) => {
-  console.log("Deleting job", schedules[job.type].length);
+  log("Deleting job " + schedules[job.type]?.length, "info");
+  const db = useModel(job.type);
   job.task.stop();
   schedules[job.type].splice(
     schedules[job.type].findIndex((element) => element.id === job.id),
     1
   );
-  console.log("End Deleting job", schedules[job.type].length);
+  db.deleteById(job.type, job.id);
+  log("End Deleting job " + schedules[job.type].length, "info");
 };
 
 /**
@@ -53,7 +56,7 @@ const _createSchedule = async (job) => {
   const duplicate = schedules[job.type]?.find(
     (schedule) => schedule.id === job.id
   );
-  if (isConnected) {
+  if (isConnected()) {
     const db = useModel(job.type);
     if (duplicate === undefined) {
       job.runImmediately = false;
@@ -61,7 +64,7 @@ const _createSchedule = async (job) => {
     }
   }
   if (duplicate !== undefined) {
-    console.log("INFO: Duplicate detected reusing job");
+    log("Duplicate detected reusing job", "info");
     deleteJob(duplicate);
   }
 
@@ -105,14 +108,17 @@ const _createSchedule = async (job) => {
     time: { day, month, hour, minute },
   });
 
-  console.log(`INFO: creating a task ${job.type} #${job.id}`);
+  log(`creating a task ${job.type} #${job.id}`, "info");
 };
 const getById = (id) => {
-  return schedules.find((schedule) => schedule.id === id);
+  log(JSON.stringify(schedules), "info");
+  for (const type in schedules) {
+    return schedules[type].find((job) => job.id === id);
+  }
 };
 
 const _getStatus = () => {
-  console.log(schedules);
+  log(schedules, "debug");
   const messages = [];
   for (const type in schedules) {
     const jobIds = schedules[type].map(
@@ -130,11 +136,9 @@ module.exports = {
    */
   createSchedule: async (job) => await _createSchedule(job),
 
-  getAll: schedules,
-
   stopById: (id) => {
     deleteJob(getById(id));
-    console.log(`Stopping task #${id}; there are ${schedules.length} active`);
+    log(`Stopping task #${id}; there are ${schedules.length} active`, "info");
   },
 
   getStatus: () => _getStatus(),

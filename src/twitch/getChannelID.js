@@ -1,9 +1,10 @@
-const { twitchOptions } = require("./OPTIONS");
 const fetch = require("node-fetch");
+const { log } = require("@llath/logger");
+
+const { twitchOptions } = require("./OPTIONS");
 
 /**
  * Fetch UserID from Twitch by name
- *
  * @async
  * @param {string} name
  * @returns {Promise<object>} id: string, error: string
@@ -17,7 +18,7 @@ const getChannelID = async (name) => {
   )
     .then((data) => data.json())
     .catch((err) => {
-      console.log(err);
+      log(err, "error");
       returnObj.error = `An Error occured: ${err}`;
       return returnObj;
     });
@@ -27,7 +28,7 @@ const getChannelID = async (name) => {
     return returnObj;
   }
 
-  console.log(`INFO: found id ${data[0].id} for name ${name}`);
+  log(`found id ${data[0].id} for name ${name}`, "info");
   returnObj.id = data[0].id;
 
   return returnObj;

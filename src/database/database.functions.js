@@ -1,28 +1,42 @@
 const db = require("./connection").getDb;
+const { log } = require("@llath/logger");
 
 async function findAll(type) {
-  console.log("INFO: Find all database items");
+  log("Find all database items for " + type, "info");
   const results = await db.model(type, this.model).find();
-  console.log("INFO end: Find all database items", results.length);
+  log("End: Find all database items " + results.length, "info");
   return results;
 }
 
 async function findById(id) {
-  console.log("Find database item");
+  log("Find database item", "info");
   let result = null;
 
   try {
     result = await db.model(id, this.model).findOne();
   } catch (error) {
-    console.log(error);
+    log(error, "error");
   }
 
-  console.log("End finding database item");
+  log("End finding database item", "info");
   return result;
 }
 
+async function deleteById(type, id) {
+  log("Deleting database item " + id, "info");
+
+  try {
+    const dbItem = db.model(type, this.model);
+    await dbItem.findOneAndRemove({ id });
+  } catch (error) {
+    log(error, "error");
+  }
+
+  log("End deleting database item", "info");
+}
+
 async function create(template) {
-  console.log("Create item with:", template);
+  log("Create item with:" + template, "info");
 
   const dbItem = db.model(template.type, this.model);
 
@@ -31,20 +45,20 @@ async function create(template) {
     useFindAndModify: false,
   });
 
-  console.log("Create Item finished");
+  log("Create Item finished", "info");
 }
 
 /**
  *
  * @param {String} _model commandName
- * @returns Functions [findById, create, findAll] and model
+ * @returns Functions [deleteById, create, findAll] and model
  */
 const useModel = (_model) => {
   if (process.env.NODE_ENV === "dev") {
     _model = _model.replace(/dev$/g, "");
   }
   const model = require(`./model/model.${_model}`);
-  return { model, findById, create, findAll };
+  return { model, create, findAll, deleteById };
 };
 
 module.exports = { useModel };

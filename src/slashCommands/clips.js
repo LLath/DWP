@@ -2,14 +2,15 @@ const {
   ApplicationCommandType,
   ApplicationCommandOptionType,
 } = require("discord-api-types/v9");
-
-const { fetchClips } = require("../twitch/clips/getClips");
-const { getChannelID } = require("../twitch/getChannelID");
-const scheduleManager = require("../helpers/scheduleManager");
 const {
   CommandInteraction,
   CommandInteractionOptionResolver,
 } = require("discord.js");
+const { log } = require("@llath/logger");
+
+const { fetchClips } = require("../twitch/clips/getClips");
+const { getChannelID } = require("../twitch/getChannelID");
+const scheduleManager = require("../helpers/scheduleManager");
 
 module.exports = {
   description: "Setup daily posts of clips from a specific twitch channel",
@@ -90,7 +91,7 @@ module.exports = {
       }
 
       if (subCommand === "stop") {
-        console.log("INFO: stop");
+        log("stop", "info");
         await interaction.reply({
           content: "Posting of clips will be stopped",
           ephemeral: true,
@@ -117,7 +118,7 @@ module.exports = {
         content: `An Error occured while fetching twitch id with name ${twitchChannelName}: ${error}`,
         ephemeral: true,
       };
-      console.log(error);
+      log(error, "error");
       if (interaction === null) {
         discordChannel.send(errorMessage);
         return;

@@ -1,4 +1,5 @@
 const { Client } = require("discord.js");
+const { log } = require("@llath/logger");
 
 const { getFiles } = require("./src/helpers/getFiles");
 const { connectRest } = require("./src/api/connection");
@@ -30,7 +31,7 @@ const loadCommands = (commandFiles) => {
  */
 const handleCommands = (client) => {
   const commandFiles = getFiles(`${pathPrefix}/commands`, suffix);
-  console.log("INFO: handleCommands - commandFiles", commandFiles);
+  log("handleCommands - commandFiles " + commandFiles, "info");
 
   const commands = loadCommands(commandFiles);
 
@@ -45,7 +46,7 @@ const handleCommands = (client) => {
     try {
       commands[commandName].callback(message, ...args);
     } catch (error) {
-      console.error(error);
+      log(error, "error");
     }
   });
 };
@@ -64,7 +65,7 @@ const handleSlashCommands = async (client, guildname) => {
   }
 
   const commandFiles = getFiles(`${pathPrefix}/slashCommands`, suffix);
-  console.log("INFO: handleSlashCommands - commandFiles", commandFiles);
+  log(`handleSlashCommands - commandFiles` + commandFiles.join("\n"), "info");
   const commands = loadCommands(commandFiles);
 
   const commandsArray = Object.keys(commands).map(

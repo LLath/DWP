@@ -1,5 +1,6 @@
 const { Channel } = require("discord.js");
 const fetch = require("node-fetch");
+const { log } = require("@llath/logger");
 
 const { twitchOptions } = require("../OPTIONS");
 
@@ -17,10 +18,10 @@ const fetchClips = async (name, channel) => {
     twitchOptions
   )
     .then((data) => data.json())
-    .catch((err) => console.log(err));
+    .catch((err) => log(err, "error"));
 
   if (data === undefined || data?.length < 1) {
-    console.log("fetchClips data is undefined");
+    log("fetchClips data is undefined", "error");
     return;
   }
 
@@ -28,7 +29,7 @@ const fetchClips = async (name, channel) => {
     `${clip.broadcaster_name} - ${clip.title} \nCreator: ${clip.creator_name} \n${clip.url}`;
 
   channel.send(`Todays clips are:`);
-  console.log(`INFO: Found ${data.length} clips for channel ${name}`);
+  log(`Found ${data.length} clips for channel ${name}`, "info");
 
   data.map((clip) => {
     channel.send(`${clipMessage(clip)}`);
