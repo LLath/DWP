@@ -4,8 +4,6 @@ const { Client } = require("discord.js");
 const { log } = require("@llath/logger");
 
 // Relative imports
-const db = require("./src/database/connection");
-
 const { getEmotes } = require("./src/twitch/emotes/getEmotes");
 
 //#endregion
@@ -30,7 +28,6 @@ client.on("ready", async (_client) => {
   _client.user.setActivity("Twitch", { type: "PLAYING" });
 
   const { handleCommands, handleSlashCommands } = require("./command-handler");
-  await db.connect();
 
   handleCommands(_client);
   if (process.env.NODE_ENV === "dev") {

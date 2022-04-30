@@ -1,8 +1,6 @@
 const cron = require("node-cron");
 const { log } = require("@llath/logger");
-
-const { useModel } = require("../database/database.functions");
-const { isConnected } = require("../database/connection");
+const fetch = require("node-fetch");
 
 const schedules = {};
 
@@ -26,15 +24,16 @@ const schedules = {};
  *
  */
 
-const deleteJob = (job) => {
+const deleteJob = async (job) => {
   log("Deleting job " + schedules[job.type]?.length, "info");
-  const db = useModel(job.type);
   job.task.stop();
   schedules[job.type].splice(
     schedules[job.type].findIndex((element) => element.id === job.id),
     1
   );
-  db.deleteById(job.type, job.id);
+  await fetch(`${process.env.API_V1_DB}/deleteItem/${job.type}/${job.id}`, {
+    method: "DELETE",
+  });
   log("End Deleting job " + schedules[job.type].length, "info");
 };
 
@@ -56,11 +55,17 @@ const _createSchedule = async (job) => {
   const duplicate = schedules[job.type]?.find(
     (schedule) => schedule.id === job.id
   );
-  if (isConnected()) {
-    const db = useModel(job.type);
+  const isConnected = await fetch(`${process.env.API_V1_DB}/isConnected`).then(
+    (res) => res.json()
+  );
+  if (isConnected) {
     if (duplicate === undefined) {
       job.runImmediately = false;
-      await db.create(job);
+      await fetch(`${process.env.API_V1_DB}/putItem/${job.type}`, {
+        method: "PUT",
+        body: JSON.stringify(job),
+        headers: { "Content-Type": "application/json" },
+      });
     }
   }
   if (duplicate !== undefined) {

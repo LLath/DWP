@@ -1,14 +1,14 @@
 const { Client } = require("discord.js");
 const { log } = require("@llath/logger");
+const fetch = require("node-fetch");
 
 const { getFiles } = require("./src/helpers/getFiles");
 const { connectRest } = require("./src/api/connection");
-const { permissionSetter } = require("./src/helpers/permissionSetter");
 const { restart } = require("./src/helpers/restartFn");
-const { isConnected } = require("./src/database/connection");
 
 const suffix = ".js";
 const pathPrefix = "./src";
+
 const loadCommands = (commandFiles) => {
   const commands = {};
   for (const command of commandFiles) {
@@ -74,9 +74,11 @@ const handleSlashCommands = async (client, guildname) => {
 
   await connectRest(guildID, commandsArray);
 
-  if (isConnected) await restart(client, commands);
+  const isConnected = await fetch(`${process.env.API_V1_DB}/isConnected`).then(
+    (res) => res.json()
+  );
 
-  // permissionSetter(client);
+  if (isConnected) await restart(client, commands);
 
   client.on("interactionCreate", async (interaction) => {
     const { commandName, options } = interaction;
