@@ -26,6 +26,7 @@ module.exports = {
           description: "Twitch channelname you want to post clips",
           required: true,
           type: ApplicationCommandOptionType.String,
+          focused: true
         },
         {
           name: "textchannel",
@@ -113,9 +114,10 @@ module.exports = {
     }
 
     const { id, error } = await getChannelID(twitchChannelName);
-    if (error) {
+    if (error?.message) {
       const errorMessage = {
-        content: `An Error occured while fetching twitch id with name ${twitchChannelName}: ${error}`,
+        content: `An Error occured while fetching twitch id with name ${twitchChannelName} 
+        ERROR: ${error.statusCode} ${error.message}`,
         ephemeral: true,
       };
       log(error, "error");
@@ -123,7 +125,7 @@ module.exports = {
         discordChannel.send(errorMessage);
         return;
       }
-      await interaction.reply(errorMessage);
+      await interaction.editReply(errorMessage);
       return;
     }
 
@@ -134,6 +136,7 @@ module.exports = {
       type: commandName,
       runImmediately,
       name: twitchChannelName,
+      dc_name: discordChannel.name
     });
   },
 };

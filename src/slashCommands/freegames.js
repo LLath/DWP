@@ -31,7 +31,7 @@ module.exports = {
         {
           name: "color",
           description: "Choose embed color",
-          type: ApplicationCommandOptionType.Number,
+          type: ApplicationCommandOptionType.String,
           choices: [...colors.getColors()],
         },
         {
@@ -56,16 +56,19 @@ module.exports = {
   ],
   callback: async (interaction, options, discordChannel, dbItem) => {
     let commandName;
-    let role = null;
+    let role = {};
     let embedColor;
     let runImmediately = false;
     if (interaction !== null && options !== null) {
       commandName = interaction.commandName;
       discordChannel = interaction.channel;
-      role = options.getRole("role")?.id;
-      embedColor = options.getNumber("color");
+      role = {
+        name: options.getRole("role")?.name,
+        id: options.getRole("role")?.id,
+      };
+      embedColor = options.getString("color");
       if (embedColor === null) {
-        embedColor = 3447003;
+        embedColor = "#99AAB5";
       }
       const subCommand = options.getSubcommand();
       const textChannel = options.getChannel("textchannel");
@@ -99,7 +102,7 @@ module.exports = {
 
       if (runImmediately) {
         freeGames.forEach((game) => {
-          message(discordChannel, game, role, embedColor);
+          message(discordChannel, game, role.id, embedColor);
         });
       } else {
         runImmediately = true;
@@ -115,6 +118,7 @@ module.exports = {
       runImmediately,
       role,
       embedColor,
+      dc_name: discordChannel.name
     });
   },
 };

@@ -12,7 +12,7 @@ const restart = async (client, commands) => {
     try {
       const _command = command + process.env.NODE_ENV;
       const items = await fetch(
-        `${process.env.API_V1_DB}/getItems/${_command}`,
+        `${process.env.API_V1}services/getItems/${_command}`,
         {
           method: "GET",
         }

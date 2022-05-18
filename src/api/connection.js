@@ -25,7 +25,7 @@ const connectRest = async (guildID, commands) => {
 
     log("Successfully reloaded application (/) commands.", "info");
   } catch (error) {
-    error(error, "error");
+    log(error, "error");
   }
 };
 
