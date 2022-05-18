@@ -74,11 +74,15 @@ const handleSlashCommands = async (client, guildname) => {
 
   await connectRest(guildID, commandsArray);
 
-  const isConnected = await fetch(`${process.env.API_V1_DB}/isConnected`).then(
-    (res) => res.json()
-  );
+  try {
+    const isConnected = await fetch(
+      `${process.env.API_V1}services/isConnected`
+    ).then((res) => res.json());
 
-  if (isConnected) await restart(client, commands);
+    if (isConnected) await restart(client, commands);
+  } catch (error) {
+    log(error, "error");
+  }
 
   client.on("interactionCreate", async (interaction) => {
     const { commandName, options } = interaction;

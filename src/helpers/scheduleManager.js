@@ -31,7 +31,7 @@ const deleteJob = async (job) => {
     schedules[job.type].findIndex((element) => element.id === job.id),
     1
   );
-  await fetch(`${process.env.API_V1_DB}/deleteItem/${job.type}/${job.id}`, {
+  await fetch(`${process.env.API_V1}services/deleteItem/${job.type}/${job.id}`, {
     method: "DELETE",
   });
   log("End Deleting job " + schedules[job.type].length, "info");
@@ -55,13 +55,13 @@ const _createSchedule = async (job) => {
   const duplicate = schedules[job.type]?.find(
     (schedule) => schedule.id === job.id
   );
-  const isConnected = await fetch(`${process.env.API_V1_DB}/isConnected`).then(
+  const isConnected = await fetch(`${process.env.API_V1}services/isConnected`).then(
     (res) => res.json()
   );
   if (isConnected) {
     if (duplicate === undefined) {
       job.runImmediately = false;
-      await fetch(`${process.env.API_V1_DB}/putItem/${job.type}`, {
+      await fetch(`${process.env.API_V1}services/putItem/${job.type}`, {
         method: "PUT",
         body: JSON.stringify(job),
         headers: { "Content-Type": "application/json" },
@@ -90,12 +90,12 @@ const _createSchedule = async (job) => {
     await job.scheduleFn();
   }
 
-  if (process.env.NODE_ENV === "dev") {
-    day = "*";
-    month = "*";
-    hour = "*";
-    minute = "*";
-  }
+  // if (process.env.NODE_ENV === "dev") {
+  //   day = "*";
+  //   month = "*";
+  //   hour = "*";
+  //   minute = "*";
+  // }
 
   const task = cron.schedule(
     `${minute} ${hour} ${day} ${month} *`,
