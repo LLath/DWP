@@ -38,9 +38,9 @@ const getChannelID = async (name) => {
 
   if (returnObj.error.statusCode === 401) {
     log("Retrying fetching twitchname id", "info")
-    // await updateTwitchOptions()
+    await updateTwitchOptions()
     retries--
-    return getChannelID(name)
+    return await getChannelID(name)
   }
 
   log(`found id ${data[0].id} for name ${name}`, "info");

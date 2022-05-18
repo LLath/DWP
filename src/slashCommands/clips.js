@@ -114,6 +114,7 @@ module.exports = {
     }
 
     const { id, error } = await getChannelID(twitchChannelName);
+
     if (error?.message) {
       const errorMessage = {
         content: `An Error occured while fetching twitch id with name ${twitchChannelName} 
