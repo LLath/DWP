@@ -60,7 +60,7 @@ const _createSchedule = async (job) => {
   );
   if (isConnected) {
     if (duplicate === undefined) {
-      job.runImmediately = false;
+      // job.runImmediately = false;
       await fetch(`${process.env.API_V1}services/putItem/${job.type}`, {
         method: "PUT",
         body: JSON.stringify(job),

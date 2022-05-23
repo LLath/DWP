@@ -66,7 +66,7 @@ module.exports = {
    */
   callback: async (interaction, options, discordChannel, dbItem) => {
     let commandName;
-    let runImmediately = false;
+    let runImmediately;
     let twitchChannelName;
     let time;
 

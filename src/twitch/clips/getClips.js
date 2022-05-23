@@ -2,7 +2,7 @@ const { Channel } = require("discord.js");
 const fetch = require("node-fetch");
 const { log } = require("@llath/logger");
 
-const { twitchOptions } = require("../OPTIONS");
+const { getTwitchOptions } = require("../OPTIONS");
 
 /**
  *
@@ -11,11 +11,12 @@ const { twitchOptions } = require("../OPTIONS");
  * @returns
  */
 const fetchClips = async (name, channel) => {
+  console.log("DEBUG: fetchClips")
   const time = new Date(new Date().setDate(new Date().getDate() - 1));
 
   const { data } = await fetch(
     `https://api.twitch.tv/helix/clips?broadcaster_id=${name}&started_at=${time.toISOString()}`,
-    twitchOptions
+    await getTwitchOptions()
   )
     .then((data) => data.json())
     .catch((err) => log(err, "error"));
