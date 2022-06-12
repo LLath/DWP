@@ -44,7 +44,7 @@ const changeSchedule = async (job) => {
   const schedule = schedules[job.type].find(
     (_schedule) => _schedule.id === job.id
   );
-  deleteJob(schedule);
+  await deleteJob(schedule);
   await _createSchedule(job);
 };
 
@@ -70,7 +70,7 @@ const _createSchedule = async (job) => {
   }
   if (duplicate !== undefined) {
     log("Duplicate detected reusing job", "info");
-    deleteJob(duplicate);
+    await deleteJob(duplicate);
   }
 
   if (schedules[job.type] === undefined) {
@@ -81,6 +81,7 @@ const _createSchedule = async (job) => {
   let hour = job?.time?.hour;
   let minute = 0;
 
+  console.log("DEBUG: JOB", job)
   if (job.changeSchedule) {
     const upcomingPromotions = await job.scheduleFn();
     day = new Date(upcomingPromotions[0]).getDate();
@@ -90,12 +91,12 @@ const _createSchedule = async (job) => {
     await job.scheduleFn();
   }
 
-  // if (process.env.NODE_ENV === "dev") {
-  //   day = "*";
-  //   month = "*";
-  //   hour = "*";
-  //   minute = "*";
-  // }
+  if (process.env.NODE_ENV === "dev") {
+    day = "*";
+    month = "*";
+    hour = "*";
+    minute = "*";
+  }
 
   const task = cron.schedule(
     `${minute} ${hour} ${day} ${month} *`,
