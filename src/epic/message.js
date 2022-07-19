@@ -6,7 +6,7 @@ const { Channel } = require("discord.js");
  */
 const message = (
   channel,
-  { title, promotion, url, thumbnail },
+  { title, promotion, url, thumbnail: _thumbnail },
   role,
   embedColor
 ) => {
@@ -25,10 +25,10 @@ const message = (
       {
         color: embedColor,
         thumbnail: {
-          url: thumbnail,
+          url: _thumbnail,
         },
         image: {
-          url: thumbnail,
+          url: _thumbnail,
         },
         title: title,
         url: url,

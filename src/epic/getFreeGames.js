@@ -82,7 +82,7 @@ const getFreeGames = async () => {
           "/home",
           ""
         )}`,
-        thumbnail: keyImages[0].url,
+        thumbnail: encodeURI(keyImages[0].url),
       };
       freeGames.push(freeGame);
     }
