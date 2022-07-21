@@ -100,6 +100,12 @@ module.exports = {
     const fetchGames = async () => {
       const { freeGames, upcomingPromotions } = await getFreeGames();
 
+      if (upcomingPromotions === undefined) {
+        discordChannel.send(
+          "No upcoming promotions, restart once Epic has another promotionspree"
+        );
+        return;
+      }
       if (runImmediately) {
         freeGames.forEach((game) => {
           message(discordChannel, game, role?.id, embedColor);
@@ -118,7 +124,7 @@ module.exports = {
       runImmediately,
       role,
       embedColor,
-      dc_name: discordChannel.name
+      dc_name: discordChannel.name,
     });
   },
 };

@@ -88,7 +88,7 @@ const getFreeGames = async () => {
     }
   );
 
-  return { freeGames, upcomingPromotions: [...new Set(upcomingPromotions)] };
+  return { freeGames, upcomingPromotions: [...new Set(upcomingPromotions)].filter(v => v) };
 };
 
 module.exports = { getFreeGames };
