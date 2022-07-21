@@ -102,7 +102,7 @@ module.exports = {
 
       if (runImmediately) {
         freeGames.forEach((game) => {
-          message(discordChannel, game, role.id, embedColor);
+          message(discordChannel, game, role?.id, embedColor);
         });
       } else {
         runImmediately = true;

@@ -57,10 +57,10 @@ const getFreeGames = async () => {
 
       if (promotions?.promotionalOffers?.length < 1) {
         log(
-          `Upcoming promotion for game ${title}; ${upcomingPromotion.startDate}`,
+          `Upcoming promotion for game ${title}; ${upcomingPromotion?.startDate}`,
           "debug"
         );
-        upcomingPromotions.push(upcomingPromotion.startDate);
+        upcomingPromotions.push(upcomingPromotion?.startDate);
         return;
       }
       if (promotion.discountSetting.discountPercentage !== 0) {
