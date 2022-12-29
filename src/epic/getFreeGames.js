@@ -47,9 +47,10 @@ const getFreeGames = async () => {
         // console.log(`No promotion for game ${title}`);
         return;
       }
-      if (offerMappings.length > 0) {
+      if (offerMappings?.length > 0) {
         productSlug = offerMappings[0].pageSlug;
       }
+      
 
       const promotion = promotions.promotionalOffers[0]?.promotionalOffers[0];
       const upcomingPromotion =
