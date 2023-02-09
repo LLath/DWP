@@ -84,7 +84,7 @@ const _createSchedule = async (job) => {
   let hour = job?.time?.hour;
   let minute = 0;
 
-  console.log("DEBUG: JOB", job);
+  console.log("DEBUG: JOB", job, "upcomingPromotions:", upcomingPromotions);
   if (job.changeSchedule) {
     const upcomingPromotions = await job.scheduleFn();
     day = new Date(upcomingPromotions[0]).getDate();
