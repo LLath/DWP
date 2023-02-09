@@ -31,9 +31,12 @@ const deleteJob = async (job) => {
     schedules[job.type].findIndex((element) => element.id === job.id),
     1
   );
-  await fetch(`${process.env.API_V1}services/deleteItem/${job.type}/${job.id}`, {
-    method: "DELETE",
-  });
+  await fetch(
+    `${process.env.API_V1}services/deleteItem/${job.type}/${job.id}`,
+    {
+      method: "DELETE",
+    }
+  );
   log("End Deleting job " + schedules[job.type].length, "info");
 };
 
@@ -55,9 +58,9 @@ const _createSchedule = async (job) => {
   const duplicate = schedules[job.type]?.find(
     (schedule) => schedule.id === job.id
   );
-  const isConnected = await fetch(`${process.env.API_V1}services/isConnected`).then(
-    (res) => res.json()
-  );
+  const isConnected = await fetch(
+    `${process.env.API_V1}services/isConnected`
+  ).then((res) => res.json());
   if (isConnected) {
     if (duplicate === undefined) {
       // job.runImmediately = false;
@@ -81,7 +84,7 @@ const _createSchedule = async (job) => {
   let hour = job?.time?.hour;
   let minute = 0;
 
-  console.log("DEBUG: JOB", job)
+  console.log("DEBUG: JOB", job);
   if (job.changeSchedule) {
     const upcomingPromotions = await job.scheduleFn();
     day = new Date(upcomingPromotions[0]).getDate();
@@ -97,7 +100,7 @@ const _createSchedule = async (job) => {
     hour = "*";
     minute = "*";
   }
-
+  console.log(`min:${minute}; hour:${hour}; day:${day}; month:${month}`);
   const task = cron.schedule(
     `${minute} ${hour} ${day} ${month} *`,
     async () => {
