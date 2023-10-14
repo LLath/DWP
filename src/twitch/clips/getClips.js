@@ -11,7 +11,7 @@ const { getTwitchOptions } = require("../OPTIONS");
  * @returns
  */
 const fetchClips = async (name, channel) => {
-  console.log("DEBUG: fetchClips")
+  console.log("DEBUG: fetchClips");
   const time = new Date(new Date().setDate(new Date().getDate() - 1));
 
   const { data } = await fetch(
@@ -19,6 +19,10 @@ const fetchClips = async (name, channel) => {
     await getTwitchOptions()
   )
     .then((data) => data.json())
+    .then((v) => {
+      console.log(v);
+      return v;
+    })
     .catch((err) => log(err, "error"));
 
   if (data === undefined || data?.length < 1) {
@@ -27,7 +31,9 @@ const fetchClips = async (name, channel) => {
   }
 
   const clipMessage = (clip) =>
-    `${clip.broadcaster_name} - ${clip.title} \nCreator: ${clip.creator_name} \n${clip.url}`;
+    `${clip.broadcaster_name} - ${clip.title} \nCreator: ${
+      clip.creator_name
+    } \n${encodeURIComponent(clip.url)}`;
 
   channel.send(`Todays clips are:`);
   log(`Found ${data.length} clips for channel ${name}`, "info");
